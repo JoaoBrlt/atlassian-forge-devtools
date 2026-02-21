@@ -1,0 +1,16 @@
+# Files ignored by Prettier, see https://prettier.io/docs/en/ignore.html
+
+# Output
+dist/
+
+# Dependencies
+node_modules/
+
+# Tests
+coverage/
+
+# Lock file
+pnpm-lock.yaml
+
+# WXT
+.wxt/

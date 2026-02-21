@@ -1,0 +1,63 @@
+name: CI
+
+# Use a concurrency group to avoid building the same branch multiple times in parallel
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true # Cancel the previous job
+
+on:
+  # Manual trigger
+  workflow_dispatch:
+
+  # When a commit is pushed
+  push:
+    branches:
+      - master
+
+  # When a pull request is created
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: read # To clone the repository
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v6
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install the dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check the format
+        run: pnpm run format
+
+      - name: Lint the code
+        run: pnpm run lint
+
+      - name: Check the types
+        run: pnpm run typecheck
+
+      - name: Run the tests
+        run: pnpm run test
+
+      - name: Build the extension (Chrome)
+        run: pnpm run build
+
+      - name: Build the extension (Firefox)
+        run: pnpm run build:firefox

@@ -1,0 +1,7 @@
+# pnpm configuration, see https://pnpm.io/settings
+
+# Allowed scripts
+allowBuilds:
+  esbuild: true
+  msw: true
+  spawn-sync: true
