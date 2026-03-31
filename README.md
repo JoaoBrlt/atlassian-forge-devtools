@@ -4,6 +4,21 @@
 
 Browser extension that provides DevTools for Atlassian Forge apps.
 
+## Download
+
+- Chrome: https://chromewebstore.google.com/detail/atlassian-forge-devtools/nofccjajldmajgiidomkffhdecihiaig
+- Firefox: Pending review
+- Manual: Download from the [Releases](https://github.com/JoaoBrlt/atlassian-forge-devtools/releases) page
+
+## Features
+
+- View Forge Function invocations.
+- View Forge Remote invocations.
+- Filter requests by name.
+- Import HAR files.
+- Export HAR files.
+- Customize the visible columns.
+
 ## Preview
 
 <img src="docs/images/preview-1.png" alt="Preview 1" width="700">
