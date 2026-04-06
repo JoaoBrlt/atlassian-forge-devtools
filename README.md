@@ -15,9 +15,9 @@ Browser extension that provides DevTools for Atlassian Forge apps.
 - View Forge Function invocations.
 - View Forge Remote invocations.
 - Filter requests by name.
+- Configure the visible columns.
 - Import HAR files.
 - Export HAR files.
-- Configure the visible columns.
 
 ## Preview
 
