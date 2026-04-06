@@ -6,13 +6,17 @@ concurrency:
   cancel-in-progress: false # Don't cancel a pending release
 
 on:
-  # When a version tag is pushed
-  push:
-    tags:
-      - "v*"
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Perform a dry run
+        required: false
+        type: boolean
+        default: false
 
 permissions:
-  contents: write # To clone the repository and create the release
+  contents: read # To clone the repository
 
 jobs:
   release:
@@ -21,8 +25,18 @@ jobs:
     timeout-minutes: 15
 
     steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+
       - name: Checkout the repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # Required to analyze commits since the last release
+          persist-credentials: false # To avoid interfering with the custom GitHub App token
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -60,8 +74,11 @@ jobs:
       - name: Package the extension (Firefox)
         run: pnpm run zip:firefox
 
-      - name: Create the release
-        id: release
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: dist/atlassian-forge-devtools-*.zip
+      - name: Release the extension
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          GIT_AUTHOR_NAME: "${{ vars.RELEASE_BOT_APP_NAME }}[bot]"
+          GIT_AUTHOR_EMAIL: "${{ vars.RELEASE_BOT_USER_ID }}+${{ vars.RELEASE_BOT_APP_NAME }}[bot]@users.noreply.github.com"
+          GIT_COMMITTER_NAME: "${{ vars.RELEASE_BOT_APP_NAME }}[bot]"
+          GIT_COMMITTER_EMAIL: "${{ vars.RELEASE_BOT_USER_ID }}+${{ vars.RELEASE_BOT_APP_NAME }}[bot]@users.noreply.github.com"
+        run: pnpm exec semantic-release ${{ inputs.dry-run == true && '--dry-run' || '' }}
