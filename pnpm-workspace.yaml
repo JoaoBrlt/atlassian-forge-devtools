@@ -1,5 +1,8 @@
 # pnpm configuration, see https://pnpm.io/settings
 
+# Minimum age (in minutes) for a package release to be considered valid.
+minimumReleaseAge: 1440
+
 # Allowed scripts
 allowBuilds:
   esbuild: true

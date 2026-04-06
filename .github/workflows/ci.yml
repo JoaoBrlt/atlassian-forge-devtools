@@ -2,7 +2,7 @@ name: CI
 
 # Use a concurrency group to avoid building the same branch multiple times in parallel
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true # Cancel the previous job
 
 on:
@@ -11,10 +11,8 @@ on:
 
   # When a commit is pushed
   push:
-    branches:
-      - master
 
-  # When a pull request is created
+  # When a pull request is created (based on the master branch)
   pull_request:
     branches:
       - master
@@ -38,7 +36,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version-file: .node-version
           cache: pnpm
 
       - name: Install the dependencies

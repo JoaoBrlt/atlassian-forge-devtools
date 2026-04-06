@@ -1,9 +1,9 @@
 name: Release
 
-# Use a concurrency group to avoid releasing the same version multiple times in parallel
+# Use a concurrency group to avoid releasing multiple versions at the same time
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true # Cancel the previous job
+  group: release
+  cancel-in-progress: false # Don't cancel a pending release
 
 on:
   # When a version tag is pushed
@@ -30,7 +30,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version-file: .node-version
           cache: pnpm
 
       - name: Install the dependencies
