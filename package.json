@@ -1,6 +1,6 @@
 {
   "name": "atlassian-forge-devtools",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Browser extension that provides DevTools for Atlassian Forge apps.",
   "license": "GPL-3.0-only",
   "author": "João Brilhante",
