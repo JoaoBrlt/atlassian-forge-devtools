@@ -69,12 +69,6 @@ jobs:
       - name: Build the extension (Firefox)
         run: pnpm run build:firefox
 
-      - name: Package the extension (Chrome)
-        run: pnpm run zip
-
-      - name: Package the extension (Firefox)
-        run: pnpm run zip:firefox
-
       - name: Release the extension
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
