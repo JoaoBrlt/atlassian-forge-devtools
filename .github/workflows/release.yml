@@ -83,3 +83,17 @@ jobs:
           GIT_COMMITTER_NAME: "${{ vars.RELEASE_BOT_APP_NAME }}[bot]"
           GIT_COMMITTER_EMAIL: "${{ vars.RELEASE_BOT_USER_ID }}+${{ vars.RELEASE_BOT_APP_NAME }}[bot]@users.noreply.github.com"
         run: pnpm exec semantic-release ${{ inputs.dry-run == true && '--dry-run' || '' }}
+
+      - name: Submit the extension
+        env:
+          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXTENSION_ID }}
+          FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
+          FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
+        run: |
+          pnpm run submit ${{ inputs.dry-run == true && '--dry-run' || '' }} \
+            --chrome-zip dist/*-chrome.zip \
+            --firefox-zip dist/*-firefox.zip --firefox-sources-zip dist/*-sources.zip
