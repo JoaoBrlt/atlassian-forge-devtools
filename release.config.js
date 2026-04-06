@@ -55,6 +55,22 @@ export default {
       },
     ],
 
+    // Package the Chrome extension
+    [
+      "@semantic-release/exec",
+      {
+        prepareCmd: "pnpm run zip",
+      },
+    ],
+
+    // Package the Firefox extension
+    [
+      "@semantic-release/exec",
+      {
+        prepareCmd: "pnpm run zip:firefox",
+      },
+    ],
+
     // Create a GitHub release
     [
       "@semantic-release/github",

@@ -69,12 +69,6 @@ jobs:
       - name: Build the extension (Firefox)
         run: pnpm run build:firefox
 
-      - name: Package the extension (Chrome)
-        run: pnpm run zip
-
-      - name: Package the extension (Firefox)
-        run: pnpm run zip:firefox
-
       - name: Release the extension
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
@@ -94,6 +88,6 @@ jobs:
           FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
           FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
         run: |
-          pnpm run submit ${{ inputs.dry-run == true && '--dry-run' || '' }} \
+          pnpm run submit --dry-run \
             --chrome-zip dist/*-chrome.zip \
             --firefox-zip dist/*-firefox.zip --firefox-sources-zip dist/*-sources.zip
