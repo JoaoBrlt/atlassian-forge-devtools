@@ -11,9 +11,11 @@ import { cn } from "@/lib/utils";
 import { AtlassianEntry } from "@/types/atlassian";
 import { formatSize } from "@/utils/size-utils";
 import { requestListColumnVisibility } from "@/utils/storage-utils";
+import { isBlank } from "@/utils/string-utils";
 import { formatDuration } from "@/utils/time-utils";
 import {
   createColumnHelper,
+  FilterFn,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -21,7 +23,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 export interface RequestListProps {
   filter: string;
@@ -133,8 +135,18 @@ const columns = [
   }),
 ];
 
+const filterByPathOrFunctionKey: FilterFn<AtlassianEntry> = (row, _columnId, filterValue: string) => {
+  const normalizedFilter = (filterValue ?? "").trim().toLowerCase();
+  if (isBlank(normalizedFilter)) {
+    return true;
+  }
+  const path = (row.getValue<string>("path") ?? "").toLowerCase();
+  const functionKey = (row.getValue<string>("functionKey") ?? "").toLowerCase();
+  return path.includes(normalizedFilter) || functionKey.includes(normalizedFilter);
+};
+
 function RequestList({ filter, requests, selectedRequest, onSelectRequest }: RequestListProps) {
-  const columnFilters = useMemo(() => (filter ? [{ id: "path", value: filter }] : []), [filter]);
+  const globalFilter = filter ?? "";
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     type: false,
     status: true,
@@ -188,14 +200,15 @@ function RequestList({ filter, requests, selectedRequest, onSelectRequest }: Req
     data: requests,
     columns: columns,
     state: {
-      columnFilters,
+      globalFilter,
       columnVisibility,
     },
     enableColumnResizing: true,
     columnResizeMode: "onChange",
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnFiltersChange: () => {},
+    globalFilterFn: filterByPathOrFunctionKey,
+    onGlobalFilterChange: () => {},
     onColumnVisibilityChange: handleColumnVisibilityChange,
     defaultColumn: {
       minSize: 60,
