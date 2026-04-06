@@ -59,7 +59,7 @@ export default {
     [
       "@semantic-release/github",
       {
-        assets: ["dist/index.html"],
+        assets: ["dist/*.zip"],
         successComment:
           ":tada: ${issue.pull_request ? 'This pull request has been released in' : 'This issue has been resolved in'} [v${nextRelease.version}](${releases.filter(r => r.url).map(r => r.url)[0]}).",
       },

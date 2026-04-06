@@ -1,4 +1,5 @@
 name: Release
+run-name: Release ${{ inputs.dry-run == true && '(dry run)' || '' }}
 
 # Use a concurrency group to avoid releasing multiple versions at the same time
 concurrency:
