@@ -10,7 +10,6 @@ export default defineConfig({
     name: "Atlassian Forge DevTools",
     browser_specific_settings: {
       gecko: {
-        // @ts-expect-error: WXT does not support this field yet
         data_collection_permissions: {
           required: ["none"],
         },
