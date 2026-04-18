@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/JoaoBrlt/atlassian-forge-devtools/compare/v1.1.0...v1.1.1) (2026-04-18)
+
+### :wrench: Chores
+
+* **deps:** update the dependencies ([#5](https://github.com/JoaoBrlt/atlassian-forge-devtools/issues/5)) ([a4b399d](https://github.com/JoaoBrlt/atlassian-forge-devtools/commit/a4b399da55b6942db09a8203d5725734eb92e266))
+
 ## [1.1.0](https://github.com/JoaoBrlt/atlassian-forge-devtools/compare/v1.0.0...v1.1.0) (2026-04-06)
 
 ### :bug: Bug Fixes
