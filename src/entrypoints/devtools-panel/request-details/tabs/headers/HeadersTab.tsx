@@ -137,7 +137,7 @@ function HeadersTab({ request }: HeadersTabProps) {
               <TableBody>
                 {generalDetails.map(({ name, value }) => (
                   <TableRow key={name} className="border-none bg-background hover:bg-background">
-                    <TableHead className="h-6 w-[30%] max-w-60 min-w-35 p-0 pb-1">{name}</TableHead>
+                    <TableHead className="h-6 w-[30%] max-w-60 min-w-35 p-0 pr-1 pb-1">{name}</TableHead>
                     <TableCell className="h-6 p-0 pb-1 break-all whitespace-normal">{value}</TableCell>
                   </TableRow>
                 ))}
@@ -157,7 +157,7 @@ function HeadersTab({ request }: HeadersTabProps) {
                 {contextDetails.length === 0 && <p>No invocation context for this request.</p>}
                 {contextDetails.map(({ name, value }) => (
                   <TableRow key={name} className="border-none bg-background hover:bg-background">
-                    <TableHead className="h-6 w-[30%] max-w-60 min-w-35 p-0 pb-1">{name}</TableHead>
+                    <TableHead className="h-6 w-[30%] max-w-60 min-w-35 p-0 pr-1 pb-1">{name}</TableHead>
                     <TableCell className="h-6 p-0 pb-1 break-all whitespace-normal">{value}</TableCell>
                   </TableRow>
                 ))}
@@ -180,7 +180,7 @@ function HeadersTab({ request }: HeadersTabProps) {
                   <TableBody>
                     {Object.entries(request.parsedResponse.headers).map(([name, value]) => (
                       <TableRow key={name} className="border-none bg-background hover:bg-background">
-                        <TableHead className="h-6 w-[30%] max-w-60 min-w-35 p-0 pb-1">{name}</TableHead>
+                        <TableHead className="h-6 w-[30%] max-w-60 min-w-35 p-0 pr-1 pb-1">{name}</TableHead>
                         <TableCell className="h-6 p-0 pb-1 wrap-break-word whitespace-normal">{value}</TableCell>
                       </TableRow>
                     ))}
@@ -205,7 +205,7 @@ function HeadersTab({ request }: HeadersTabProps) {
                   <TableBody>
                     {Object.entries(request.parsedRequest.headers).map(([name, value]) => (
                       <TableRow key={name} className="border-none bg-background hover:bg-background">
-                        <TableHead className="h-6 w-[30%] max-w-60 min-w-35 p-0 pb-1">{name}</TableHead>
+                        <TableHead className="h-6 w-[30%] max-w-60 min-w-35 p-0 pr-1 pb-1">{name}</TableHead>
                         <TableCell className="h-6 p-0 pb-1 wrap-break-word whitespace-normal">{value}</TableCell>
                       </TableRow>
                     ))}

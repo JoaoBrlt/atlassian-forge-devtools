@@ -10,12 +10,14 @@ const TIME_UNITS = [
  * Formats a duration.
  * @param value the duration to format (in milliseconds)
  * @param precision the number of decimal places to use (default: 2)
+ * @param fallback the fallback string to return if the duration is invalid (default: "")
  * @return the duration in a human-readable format
  */
-export function formatDuration(value: number, precision = 2): string {
-  if (Number.isNaN(value) || !Number.isFinite(value) || value < 0) {
-    return "";
+export function formatDuration(value: number | undefined | null, precision = 2, fallback = ""): string {
+  if (value == null || Number.isNaN(value) || !Number.isFinite(value) || value < 0) {
+    return fallback;
   }
+
   if (value === 0) {
     return "0 ms";
   }

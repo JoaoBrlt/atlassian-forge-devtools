@@ -8,14 +8,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import HeadersTab from "@/entrypoints/devtools-panel/request-details/tabs/headers/HeadersTab";
-import RequestTab from "@/entrypoints/devtools-panel/request-details/tabs/request/RequestTab";
 import { useVisibleItems } from "@/hooks/useVisibleItems";
 import { cn } from "@/lib/utils";
 import { AtlassianEntry } from "@/types/atlassian";
 import { ChevronsRight, X } from "lucide-react";
 import { useState } from "react";
+import HeadersTab from "./tabs/headers/HeadersTab";
+import RequestTab from "./tabs/request/RequestTab";
 import ResponseTab from "./tabs/response/ResponseTab";
+import TimingsTab from "./tabs/timings/TimingsTab";
 
 export interface RequestDetailsProps {
   request: AtlassianEntry;
@@ -39,6 +40,10 @@ const TABS: Tab[] = [
   {
     label: "Response",
     value: "response",
+  },
+  {
+    label: "Timings",
+    value: "timings",
   },
 ];
 
@@ -135,6 +140,9 @@ function RequestDetails({ request, onCloseRequest }: RequestDetailsProps) {
       </TabsContent>
       <TabsContent value="response" className="flex h-full w-full flex-col gap-0 overflow-auto p-0">
         <ResponseTab request={request} />
+      </TabsContent>
+      <TabsContent value="timings" className="flex h-full w-full flex-col gap-0 overflow-auto p-0">
+        <TimingsTab request={request} />
       </TabsContent>
     </Tabs>
   );
