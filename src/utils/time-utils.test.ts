@@ -2,15 +2,23 @@ import { describe, expect, it } from "vitest";
 import { formatDuration } from "./time-utils";
 
 describe("formatDuration", () => {
-  it("should return an empty string if the duration is not a number", () => {
+  it("should return the fallback string if the duration is undefined", () => {
+    expect(formatDuration(undefined)).toBe("");
+  });
+
+  it("should return the fallback string if the duration is null", () => {
+    expect(formatDuration(null)).toBe("");
+  });
+
+  it("should return the fallback string if the duration is not a number", () => {
     expect(formatDuration(NaN)).toBe("");
   });
 
-  it("should return an empty string if the duration is infinite", () => {
+  it("should return the fallback string if the duration is infinite", () => {
     expect(formatDuration(Infinity)).toBe("");
   });
 
-  it("should return an empty string if the duration is negative", () => {
+  it("should return the fallback string if the duration is negative", () => {
     expect(formatDuration(-1)).toBe("");
   });
 
