@@ -34,7 +34,7 @@
   "packageManager": "pnpm@10.33.2",
   "engines": {
     "node": ">=24",
-    "pnpm": ">=10"
+    "pnpm": ">=10.33.2"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
