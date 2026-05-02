@@ -21,7 +21,7 @@ importers:
         specifier: ^6.6.0
         version: 6.6.0
       '@codemirror/view':
-        specifier: ^6.41.0
+        specifier: ^6.41.1
         version: 6.41.1
       '@fontsource-variable/inter':
         specifier: ^5.2.8
