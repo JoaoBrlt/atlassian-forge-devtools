@@ -95,7 +95,7 @@
     "semantic-release": "^25.0.3",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.1",
-    "vite": "^8.0.8",
+    "vite": "^8.0.10",
     "vitest": "^4.1.4",
     "wxt": "^0.20.25"
   }
