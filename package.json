@@ -31,7 +31,7 @@
     "zip:firefox": "wxt zip -b firefox",
     "submit": "wxt submit"
   },
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@10.33.2",
   "engines": {
     "node": ">=24",
     "pnpm": ">=10"

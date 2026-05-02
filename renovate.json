@@ -1,6 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended", ":disableDependencyDashboard"],
+  "rangeStrategy": "bump",
+  "postUpdateOptions": ["pnpmDedupe"],
   "minimumReleaseAge": "3 days",
   "prCreation": "not-pending",
   "internalChecksFilter": "strict",
