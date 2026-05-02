@@ -154,7 +154,7 @@ importers:
         specifier: ^9.1.7
         version: 9.1.7
       jsdom:
-        specifier: ^29.0.2
+        specifier: ^29.1.0
         version: 29.1.0(@noble/hashes@1.8.0)
       lint-staged:
         specifier: ^16.4.0
