@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/JoaoBrlt/atlassian-forge-devtools/compare/v1.2.0...v1.2.1) (2026-05-02)
+
+### :wrench: Chores
+
+* configure Renovate ([#7](https://github.com/JoaoBrlt/atlassian-forge-devtools/issues/7)) ([270dffa](https://github.com/JoaoBrlt/atlassian-forge-devtools/commit/270dffa8c5fc6a9056be47e3507da29f42730f99))
+* **deps:** update the dependencies ([9b9de3b](https://github.com/JoaoBrlt/atlassian-forge-devtools/commit/9b9de3bfeb9a4cfd2ef70be76e1648150ad743f1))
+
 ## [1.2.0](https://github.com/JoaoBrlt/atlassian-forge-devtools/compare/v1.1.1...v1.2.0) (2026-04-18)
 
 ### :rocket: Features
