@@ -42,7 +42,7 @@ const AtlassianInvokeExtensionFunctionRequestPayloadSchema = z.object({
   functionKey: z.string(),
 
   // (Optional) The payload of the Forge function
-  payload: z.unknown(),
+  payload: z.unknown().optional().nullable(),
 });
 
 /**
@@ -59,7 +59,7 @@ const AtlassianInvokeExtensionRemoteRequestPayloadSchema = z.object({
   headers: z.record(z.string(), z.string()).optional().nullable(),
 
   // (Optional) The HTTP request body
-  body: z.unknown(),
+  body: z.unknown().optional().nullable(),
 });
 
 /**
@@ -151,7 +151,7 @@ const AtlassianInvokeExtensionResponseErrorSchema = z.object({
 /**
  * Validates the response body of an Atlassian Forge function invocation.
  */
-const AtlassianInvokeExtensionFunctionResponseBodySchema = z.unknown();
+const AtlassianInvokeExtensionFunctionResponseBodySchema = z.unknown().optional().nullable();
 
 /**
  * Validates the response body of an Atlassian Forge remote invocation.
@@ -170,7 +170,7 @@ const AtlassianInvokeExtensionRemoteResponseBodySchema = z.object({
       headers: z.record(z.string(), z.array(z.string())).optional().nullable(),
 
       // (Optional) The HTTP response body
-      body: z.unknown(),
+      body: z.unknown().optional().nullable(),
     })
     .optional()
     .nullable(),
@@ -185,7 +185,7 @@ const AtlassianInvokeExtensionRemoteResponseBodySchema = z.object({
       headers: z.record(z.string(), z.array(z.string())),
 
       // (Optional) The HTTP response body
-      body: z.unknown(),
+      body: z.unknown().optional().nullable(),
     })
     .optional()
     .nullable(),
