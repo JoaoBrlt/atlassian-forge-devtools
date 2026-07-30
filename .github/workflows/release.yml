@@ -34,7 +34,7 @@ jobs:
           private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
 
       - name: Checkout the repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0 # Required to analyze commits since the last release
           persist-credentials: false # To avoid interfering with the custom GitHub App token
