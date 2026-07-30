@@ -1,5 +1,5 @@
 import { useIsMounted } from "@/hooks/useIsMounted";
-import { RefObject, useEffect, useRef, useState } from "react";
+import { type RefObject, useEffect, useRef, useState } from "react";
 
 /**
  * Represents the size of an element.

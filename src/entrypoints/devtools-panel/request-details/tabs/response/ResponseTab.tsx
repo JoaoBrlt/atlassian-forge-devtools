@@ -1,6 +1,6 @@
 import JsonViewer from "@/components/json-viewer/JsonViewer.lazy";
 import JsonViewerSkeleton from "@/components/json-viewer/JsonViewer.skeleton";
-import { AtlassianEntry } from "@/types/atlassian";
+import type { AtlassianEntry } from "@/types/atlassian";
 import { Suspense } from "react";
 
 export interface RequestTabProps {

@@ -1,5 +1,5 @@
 import { storage } from "#imports";
-import { VisibilityState } from "@tanstack/react-table";
+import type { VisibilityState } from "@tanstack/react-table";
 
 /**
  * Storage item for the visible columns of the request list.

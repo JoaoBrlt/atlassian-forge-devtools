@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { AtlassianEntry } from "@/types/atlassian";
+import type { AtlassianEntry } from "@/types/atlassian";
 import { formatDuration } from "@/utils/time-utils";
 import { CircleQuestionMark } from "lucide-react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export interface TimingsTabProps {
   request: AtlassianEntry;

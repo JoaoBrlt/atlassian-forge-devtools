@@ -10,7 +10,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useVisibleItems } from "@/hooks/useVisibleItems";
 import { cn } from "@/lib/utils";
-import { AtlassianEntry } from "@/types/atlassian";
+import type { AtlassianEntry } from "@/types/atlassian";
 import { ChevronsRight, X } from "lucide-react";
 import { useState } from "react";
 import HeadersTab from "./tabs/headers/HeadersTab";

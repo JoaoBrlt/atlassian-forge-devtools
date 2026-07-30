@@ -1,4 +1,4 @@
-import { Entry, Har, Log } from "har-format";
+import type { Entry, Har, Log } from "har-format";
 import { describe, expect, it } from "vitest";
 import { buildHarFile, parseHarFile } from "./har-utils";
 

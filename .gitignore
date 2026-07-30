@@ -6,6 +6,9 @@ dist/
 # Dependencies
 node_modules/
 
+# pnpm
+.pnpm-store/
+
 # Tests
 coverage/
 

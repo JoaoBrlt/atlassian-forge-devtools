@@ -1,6 +1,6 @@
 import { MinimalHarSchema } from "@/schemas/har";
 import { buildJsonFile, parseJsonFile } from "@/utils/file-utils";
-import { Entry, Har } from "har-format";
+import type { Entry, Har } from "har-format";
 
 /**
  * Parses a HAR file.

@@ -1,10 +1,12 @@
-const TIME_UNITS = [
+type TimeUnit = { label: string; scale: number };
+
+const TIME_UNITS: TimeUnit[] = [
   { label: "d", scale: 86_400_000 },
   { label: "h", scale: 3_600_000 },
   { label: "m", scale: 60_000 },
   { label: "s", scale: 1_000 },
   { label: "ms", scale: 1 },
-] as const;
+];
 
 /**
  * Formats a duration.
@@ -22,7 +24,7 @@ export function formatDuration(value: number | undefined | null, precision = 2, 
     return "0 ms";
   }
 
-  let selectedUnit = TIME_UNITS[TIME_UNITS.length - 1];
+  let selectedUnit = TIME_UNITS[TIME_UNITS.length - 1] as TimeUnit;
   for (const unit of TIME_UNITS) {
     if (value >= unit.scale) {
       selectedUnit = unit;

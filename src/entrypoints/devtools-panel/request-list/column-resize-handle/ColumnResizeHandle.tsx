@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { ComponentProps } from "react";
+import type { ComponentProps } from "react";
 
 export interface ColumnResizeHandleProps extends ComponentProps<"div"> {
   isResizing?: boolean;

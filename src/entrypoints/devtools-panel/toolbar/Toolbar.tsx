@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Download, Funnel, Trash, Upload, X } from "lucide-react";
-import { ChangeEvent, useRef } from "react";
+import { type ChangeEvent, useRef } from "react";
 
 export interface ToolbarProps {
   filter: string;

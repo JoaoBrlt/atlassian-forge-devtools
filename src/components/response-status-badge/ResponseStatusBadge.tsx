@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { AtlassianResponse } from "@/types/atlassian";
+import type { AtlassianResponse } from "@/types/atlassian";
 import { getSafeStatusText } from "@/utils/http-utils";
 
 export interface ResponseStatusBadgeProps {

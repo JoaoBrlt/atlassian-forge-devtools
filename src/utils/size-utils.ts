@@ -1,10 +1,12 @@
-const SIZE_UNITS = [
+type SizeUnit = { label: string; scale: number };
+
+const SIZE_UNITS: SizeUnit[] = [
   { label: "TB", scale: 1e12 },
   { label: "GB", scale: 1e9 },
   { label: "MB", scale: 1e6 },
   { label: "kB", scale: 1e3 },
   { label: "B", scale: 1 },
-] as const;
+];
 
 /**
  * Formats a storage size.
@@ -20,7 +22,7 @@ export function formatSize(value: number, precision = 2): string {
     return "0 B";
   }
 
-  let selectedUnit = SIZE_UNITS[SIZE_UNITS.length - 1];
+  let selectedUnit = SIZE_UNITS[SIZE_UNITS.length - 1] as SizeUnit;
   for (const unit of SIZE_UNITS) {
     if (value >= unit.scale) {
       selectedUnit = unit;

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { RotateCcw, TriangleAlert } from "lucide-react";
-import { FallbackProps } from "react-error-boundary";
+import type { FallbackProps } from "react-error-boundary";
 
 function getErrorStack(error: unknown): string {
   if (error instanceof Error) {

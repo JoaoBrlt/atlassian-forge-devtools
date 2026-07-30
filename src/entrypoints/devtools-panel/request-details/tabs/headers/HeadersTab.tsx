@@ -1,10 +1,10 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
-import { AtlassianEntry } from "@/types/atlassian";
+import type { AtlassianEntry } from "@/types/atlassian";
 import { formatSize } from "@/utils/size-utils";
 import { getSafeStatusText } from "@/utils/http-utils";
 import { formatDuration } from "@/utils/time-utils";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export interface HeadersTabProps {
   request: AtlassianEntry;
