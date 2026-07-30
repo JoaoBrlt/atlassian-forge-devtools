@@ -10,6 +10,7 @@ export default defineConfig({
     name: "Atlassian Forge DevTools",
     browser_specific_settings: {
       gecko: {
+        id: "{e41ada0e-4490-476a-94ae-6afe006dcf61}",
         data_collection_permissions: {
           required: ["none"],
         },
