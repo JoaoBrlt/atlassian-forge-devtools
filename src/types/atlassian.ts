@@ -12,8 +12,7 @@ export interface AtlassianEntry<RequestType = unknown, ResponseType = unknown> e
  * Represents the parsed request of an Atlassian Forge extension invocation.
  */
 export type AtlassianRequest<RequestType = unknown> =
-  | AtlassianFunctionRequest<RequestType>
-  | AtlassianRemoteRequest<RequestType>;
+  AtlassianFunctionRequest<RequestType> | AtlassianRemoteRequest<RequestType>;
 
 /**
  * Represents the parsed request of an Atlassian Forge function invocation.
@@ -56,15 +55,13 @@ export interface AtlassianRequestContext {
  * Represents the parsed response of an Atlassian Forge extension invocation.
  */
 export type AtlassianResponse<ResponseType = unknown> =
-  | AtlassianFunctionResponse<ResponseType>
-  | AtlassianRemoteResponse<ResponseType>;
+  AtlassianFunctionResponse<ResponseType> | AtlassianRemoteResponse<ResponseType>;
 
 /**
  * Represents the parsed response of an Atlassian Forge function invocation.
  */
 export type AtlassianFunctionResponse<ResponseType = unknown> =
-  | AtlassianFunctionSuccessResponse<ResponseType>
-  | AtlassianFunctionErrorResponse;
+  AtlassianFunctionSuccessResponse<ResponseType> | AtlassianFunctionErrorResponse;
 
 /**
  * Represents the parsed response of a successful Atlassian Forge function invocation.
@@ -94,8 +91,7 @@ export interface AtlassianFunctionErrorResponse {
  * Represents the parsed response of an Atlassian Forge remote invocation.
  */
 export type AtlassianRemoteResponse<ResponseType = unknown> =
-  | AtlassianRemoteSuccessResponse<ResponseType>
-  | AtlassianRemoteErrorResponse;
+  AtlassianRemoteSuccessResponse<ResponseType> | AtlassianRemoteErrorResponse;
 
 /**
  * Represents the parsed response of a successful Atlassian Forge remote invocation.
