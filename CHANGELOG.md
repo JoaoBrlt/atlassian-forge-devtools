@@ -1,3 +1,5 @@
+## [1.2.4](https://github.com/JoaoBrlt/atlassian-forge-devtools/compare/v1.2.3...v1.2.4) (2026-07-30)
+
 ## [1.2.3](https://github.com/JoaoBrlt/atlassian-forge-devtools/compare/v1.2.2...v1.2.3) (2026-07-30)
 
 ### :wrench: Chores
