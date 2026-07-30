@@ -1,14 +1,14 @@
-import { Browser } from "#imports";
+import type { Browser } from "#imports";
 import {
-  AtlassianInvokeExtensionFunctionResponse,
+  type AtlassianInvokeExtensionFunctionResponse,
   AtlassianInvokeExtensionFunctionResponseSchema,
-  AtlassianInvokeExtensionRemoteResponse,
+  type AtlassianInvokeExtensionRemoteResponse,
   AtlassianInvokeExtensionRemoteResponseSchema,
-  AtlassianInvokeExtensionRequest,
+  type AtlassianInvokeExtensionRequest,
   AtlassianInvokeExtensionRequestSchema,
   AtlassianRequestHarEntrySchema,
 } from "@/schemas/atlassian";
-import {
+import type {
   AtlassianEntry,
   AtlassianFunctionResponse,
   AtlassianRemoteResponse,
@@ -16,7 +16,7 @@ import {
   AtlassianResponse,
 } from "@/types/atlassian";
 import { base64ToString, isBlank, isNotBlank } from "@/utils/string-utils";
-import { Entry } from "har-format";
+import type { Entry } from "har-format";
 
 /**
  * Parses a HAR entry into an Atlassian HAR entry (if the request is an Atlassian Forge extension invocation).

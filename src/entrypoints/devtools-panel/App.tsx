@@ -1,6 +1,6 @@
-import { browser, Browser } from "#imports";
+import { browser, type Browser } from "#imports";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { AtlassianEntry } from "@/types/atlassian";
+import type { AtlassianEntry } from "@/types/atlassian";
 import { buildHarFile, parseHarFile } from "@/utils/har-utils";
 import { parseHarEntry } from "@/utils/atlassian-utils";
 import { Suspense, useCallback, useEffect, useState } from "react";

@@ -1,7 +1,7 @@
-import { Entry } from "har-format";
+import type { Entry } from "har-format";
 import { describe, expect, it } from "vitest";
 import { parseHarEntry } from "./atlassian-utils";
-import { Browser } from "#imports";
+import type { Browser } from "#imports";
 
 function buildFunctionCall(overrides?: Record<string, unknown>) {
   return { functionKey: "my-function", payload: { input: "data" }, ...overrides };

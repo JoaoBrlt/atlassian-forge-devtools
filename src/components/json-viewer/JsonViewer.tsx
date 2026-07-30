@@ -5,7 +5,7 @@ import { foldGutter, HighlightStyle, syntaxHighlighting } from "@codemirror/lang
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { tags } from "@lezer/highlight";
-import CodeMirror, { BasicSetupOptions, ReactCodeMirrorProps } from "@uiw/react-codemirror";
+import CodeMirror, { type BasicSetupOptions, type ReactCodeMirrorProps } from "@uiw/react-codemirror";
 import { useMemo } from "react";
 
 const basicSetup: BasicSetupOptions = {

@@ -1,4 +1,4 @@
-import { Size, useResizeObserver } from "@/hooks/useResizeObserver";
+import { type Size, useResizeObserver } from "@/hooks/useResizeObserver";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export interface UseVisibleItemsOptions {
@@ -37,10 +37,10 @@ export function computeVisibleCount(availableWidth: number, itemWidths: number[]
   const remainingWidth = Math.max(0, availableWidth - ellipsisWidth);
   let usedWidth = 0;
 
-  for (let i = 0; i < itemWidths.length; i++) {
-    usedWidth += itemWidths[i];
+  for (const [index, itemWidth] of itemWidths.entries()) {
+    usedWidth += itemWidth;
     if (usedWidth > remainingWidth) {
-      return i;
+      return index;
     }
   }
 

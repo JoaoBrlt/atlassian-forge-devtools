@@ -8,20 +8,20 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import ColumnResizeHandle from "@/entrypoints/devtools-panel/request-list/column-resize-handle/ColumnResizeHandle";
 import { cn } from "@/lib/utils";
-import { AtlassianEntry } from "@/types/atlassian";
+import type { AtlassianEntry } from "@/types/atlassian";
 import { formatSize } from "@/utils/size-utils";
 import { requestListColumnVisibility } from "@/utils/storage-utils";
 import { isBlank } from "@/utils/string-utils";
 import { formatDuration } from "@/utils/time-utils";
 import {
   createColumnHelper,
-  FilterFn,
+  type FilterFn,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  Updater,
+  type Updater,
   useReactTable,
-  VisibilityState,
+  type VisibilityState,
 } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 

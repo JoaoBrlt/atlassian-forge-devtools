@@ -1,4 +1,4 @@
-import { Entry } from "har-format";
+import type { Entry } from "har-format";
 
 /**
  * Represents the HAR entry of an Atlassian Forge extension invocation.
