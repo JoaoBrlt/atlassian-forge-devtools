@@ -98,22 +98,22 @@ const theme = EditorView.theme(
     },
     // Selection background
     ".cm-selectionBackground, ::selection": {
-      background: "var(--color-muted)",
+      background: "var(--color-foreground)",
     },
     // Selection background (focused)
     "&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground": {
-      background: "var(--color-muted)",
+      background: "var(--color-foreground)",
     },
     // Selection match
     ".cm-selectionMatch": {
-      backgroundColor: "var(--color-muted)",
+      backgroundColor: "var(--color-muted-foreground)",
     },
     // Search match
     ".cm-searchMatch": {
-      backgroundColor: "var(--color-warning)",
+      backgroundColor: "var(--color-muted-foreground)",
     },
     ".cm-searchMatch-selected": {
-      border: "1px solid var(--color-warning)",
+      border: "1px solid var(--color-foreground)",
       backgroundColor: "transparent",
     },
     // Panels
