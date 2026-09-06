@@ -1,18 +1,13 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
 import type { AtlassianEntry } from "@/types/atlassian";
+import { getSafeStatusText, parseUrl } from "@/utils/http-utils";
 import { formatSize } from "@/utils/size-utils";
-import { getSafeStatusText } from "@/utils/http-utils";
 import { formatDuration } from "@/utils/time-utils";
-import type { ReactNode } from "react";
+import RequestDetailRow, { type RequestDetail } from "./request-detail-row/RequestDetailRow";
 
 export interface HeadersTabProps {
   request: AtlassianEntry;
-}
-
-interface RequestDetail {
-  name: string;
-  value: ReactNode;
 }
 
 function getStatusColor(status: number) {
@@ -42,6 +37,17 @@ function getResponseStatus(entry: AtlassianEntry) {
   return <p className="font-semibold text-text-destructive">Failed</p>;
 }
 
+function getPathParts(pathString: string): RequestDetail[] {
+  const { protocol, host, pathname, searchParams = [], hash } = parseUrl(pathString);
+  return [
+    { name: "Protocol", value: protocol },
+    { name: "Host", value: host },
+    { name: "Pathname", value: pathname },
+    ...searchParams,
+    { name: "Hash", value: hash },
+  ].filter((part) => part.value != null);
+}
+
 function getGeneralDetails(entry: AtlassianEntry): RequestDetail[] {
   return [
     {
@@ -59,6 +65,7 @@ function getGeneralDetails(entry: AtlassianEntry): RequestDetail[] {
     {
       name: "Path",
       value: entry.parsedRequest.type === "invokeRemote" ? entry.parsedRequest.path : undefined,
+      parts: entry.parsedRequest.type === "invokeRemote" ? getPathParts(entry.parsedRequest.path) : undefined,
     },
     {
       name: "Status",
@@ -135,11 +142,8 @@ function HeadersTab({ request }: HeadersTabProps) {
           <AccordionContent className="p-2 text-xs">
             <Table className="text-xs">
               <TableBody>
-                {generalDetails.map(({ name, value }) => (
-                  <TableRow key={name} className="border-none bg-background hover:bg-background">
-                    <TableHead className="h-6 w-[30%] max-w-60 min-w-35 p-0 pr-1 pb-1">{name}</TableHead>
-                    <TableCell className="h-6 p-0 pb-1 break-all whitespace-normal">{value}</TableCell>
-                  </TableRow>
+                {generalDetails.map((detail) => (
+                  <RequestDetailRow key={detail.name} detail={detail} />
                 ))}
               </TableBody>
             </Table>
@@ -155,11 +159,8 @@ function HeadersTab({ request }: HeadersTabProps) {
             <Table className="text-xs">
               <TableBody>
                 {contextDetails.length === 0 && <p>No invocation context for this request.</p>}
-                {contextDetails.map(({ name, value }) => (
-                  <TableRow key={name} className="border-none bg-background hover:bg-background">
-                    <TableHead className="h-6 w-[30%] max-w-60 min-w-35 p-0 pr-1 pb-1">{name}</TableHead>
-                    <TableCell className="h-6 p-0 pb-1 break-all whitespace-normal">{value}</TableCell>
-                  </TableRow>
+                {contextDetails.map((detail) => (
+                  <RequestDetailRow key={detail.name} detail={detail} />
                 ))}
               </TableBody>
             </Table>
