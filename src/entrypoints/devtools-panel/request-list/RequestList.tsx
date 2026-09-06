@@ -14,14 +14,19 @@ import { requestListColumnVisibility } from "@/utils/storage-utils";
 import { isBlank } from "@/utils/string-utils";
 import { formatDuration } from "@/utils/time-utils";
 import {
+  columnFilteringFeature,
+  columnResizingFeature,
+  columnSizingFeature,
+  columnVisibilityFeature,
+  type ColumnVisibilityState,
   createColumnHelper,
+  createFilteredRowModel,
   type FilterFn,
   flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
+  globalFilteringFeature,
+  tableFeatures,
   type Updater,
-  useReactTable,
-  type VisibilityState,
+  useTable,
 } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 
@@ -32,9 +37,18 @@ export interface RequestListProps {
   onSelectRequest: (request: AtlassianEntry) => void;
 }
 
-const columnHelper = createColumnHelper<AtlassianEntry>();
+const features = tableFeatures({
+  columnFilteringFeature,
+  columnResizingFeature,
+  columnSizingFeature,
+  columnVisibilityFeature,
+  globalFilteringFeature,
+  filteredRowModel: createFilteredRowModel(),
+});
 
-const columns = [
+const columnHelper = createColumnHelper<typeof features, AtlassianEntry>();
+
+const columns = columnHelper.columns([
   columnHelper.accessor("parsedRequest.type", {
     id: "type",
     header: "Type",
@@ -133,9 +147,9 @@ const columns = [
       return formatDuration(value);
     },
   }),
-];
+]);
 
-const filterByPathOrFunctionKey: FilterFn<AtlassianEntry> = (row, _columnId, filterValue: string) => {
+const filterByPathOrFunctionKey: FilterFn<typeof features, AtlassianEntry> = (row, _columnId, filterValue: string) => {
   const normalizedFilter = (filterValue ?? "").trim().toLowerCase();
   if (isBlank(normalizedFilter)) {
     return true;
@@ -147,7 +161,7 @@ const filterByPathOrFunctionKey: FilterFn<AtlassianEntry> = (row, _columnId, fil
 
 function RequestList({ filter, requests, selectedRequest, onSelectRequest }: RequestListProps) {
   const globalFilter = filter ?? "";
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>({
     type: false,
     status: true,
     functionKey: true,
@@ -181,7 +195,7 @@ function RequestList({ filter, requests, selectedRequest, onSelectRequest }: Req
       });
   }, []);
 
-  const handleColumnVisibilityChange = (updater: Updater<VisibilityState>) => {
+  const handleColumnVisibilityChange = (updater: Updater<ColumnVisibilityState>) => {
     // Update the column visibility state
     setColumnVisibility((prev) => {
       const next = typeof updater === "function" ? updater(prev) : updater;
@@ -196,7 +210,8 @@ function RequestList({ filter, requests, selectedRequest, onSelectRequest }: Req
     });
   };
 
-  const table = useReactTable({
+  const table = useTable({
+    features,
     data: requests,
     columns: columns,
     state: {
@@ -205,8 +220,6 @@ function RequestList({ filter, requests, selectedRequest, onSelectRequest }: Req
     },
     enableColumnResizing: true,
     columnResizeMode: "onChange",
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     globalFilterFn: filterByPathOrFunctionKey,
     onGlobalFilterChange: () => {},
     onColumnVisibilityChange: handleColumnVisibilityChange,

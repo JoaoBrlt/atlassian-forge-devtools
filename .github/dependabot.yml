@@ -16,7 +16,8 @@ updates:
       prefix: "chore"
       prefix-development: "chore"
       include: "scope"
-    labels: []
+    labels:
+      - "dependabot"
     groups:
       all-actions:
         patterns:
@@ -63,7 +64,8 @@ updates:
       prefix: "chore"
       prefix-development: "chore"
       include: "scope"
-    labels: []
+    labels:
+      - "dependabot"
     groups:
       all-dependencies:
         patterns:
