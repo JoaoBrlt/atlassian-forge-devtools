@@ -1,6 +1,6 @@
 # pnpm configuration, see https://pnpm.io/settings
 
-# Minimum age (in minutes) for a package release to be considered valid.
+# Minimum age for a package release to be considered valid (in minutes).
 minimumReleaseAge: 4320 # 3 days
 
 # Allowed scripts

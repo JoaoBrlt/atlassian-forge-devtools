@@ -1,0 +1,58 @@
+# Dependabot options
+# See https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference
+version: 2
+updates:
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: "cron"
+      cronjob: "0 8 * * 1"
+      timezone: "Europe/Paris"
+    cooldown:
+      default-days: 3
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    labels: []
+    groups:
+      all-actions:
+        patterns:
+          - "*"
+
+  # NPM packages
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: "cron"
+      cronjob: "0 8 * * 1"
+      timezone: "Europe/Paris"
+    cooldown:
+      default-days: 3
+      semver-patch-days: 3
+      semver-minor-days: 7
+      semver-major-days: 14
+    ignore:
+      # Reason: pnpm should be updated manually
+      - dependency-name: "pnpm"
+        update-types: ["version-update:semver-major"]
+
+      # Reason: Node should be updated manually
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
+
+      # Reason: TypeScript 7 is not compatible with "typescript-eslint" yet
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    labels: []
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"

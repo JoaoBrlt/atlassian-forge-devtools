@@ -9,13 +9,15 @@ on:
   # Manual trigger
   workflow_dispatch:
 
-  # When a commit is pushed
+  # When a commit is pushed to the master branch
   push:
-
-  # When a pull request is created (based on the master branch)
-  pull_request:
     branches:
       - master
+
+  # When a pull request is opened, synchronized, reopened
+  pull_request:
+    branches:
+      - "**"
 
 permissions:
   contents: read # To clone the repository
