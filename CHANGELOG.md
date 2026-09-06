@@ -1,5 +1,15 @@
 ## [1.2.4](https://github.com/JoaoBrlt/atlassian-forge-devtools/compare/v1.2.3...v1.2.4) (2026-07-30)
 
+### :bug: Bug Fixes
+
+* fix the style of selected text in the json viewer ([#94](https://github.com/JoaoBrlt/atlassian-forge-devtools/issues/94)) ([58ecef1](https://github.com/JoaoBrlt/atlassian-forge-devtools/commit/58ecef14720324fa98da205ed074b9cdabb2fa8d))
+
+### :wrench: Chores
+* move shadcn to a dev dependency ([#93](https://github.com/JoaoBrlt/atlassian-forge-devtools/issues/93)) ([76b9064](https://github.com/JoaoBrlt/atlassian-forge-devtools/commit/76b9064b27e82c5081560dbdaa63b3a746f230e9))
+* fix warning about deprecated "app-id" GitHub Action parameter ([#92](https://github.com/JoaoBrlt/atlassian-forge-devtools/issues/92)) ([0521b7d](https://github.com/JoaoBrlt/atlassian-forge-devtools/commit/0521b7dfab0164103b3b116d2c0c1c20423bf51d))
+* fix Firefox warning about missing extension id in manifest ([#91](https://github.com/JoaoBrlt/atlassian-forge-devtools/issues/91)) ([5ad8a9a](https://github.com/JoaoBrlt/atlassian-forge-devtools/commit/5ad8a9a4ffda84f3479f9073141670a5c751b584))
+* fix semantic release config ([#90](https://github.com/JoaoBrlt/atlassian-forge-devtools/issues/90)) ([9a18510](https://github.com/JoaoBrlt/atlassian-forge-devtools/commit/9a18510f1ee020eba03bb1ff0cf0c683d0abb0b4))
+
 ## [1.2.3](https://github.com/JoaoBrlt/atlassian-forge-devtools/compare/v1.2.2...v1.2.3) (2026-07-30)
 
 ### :wrench: Chores

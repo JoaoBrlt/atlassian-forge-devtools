@@ -47,11 +47,11 @@ jobs:
       - name: Check the format
         run: pnpm run format
 
-      - name: Lint the code
-        run: pnpm run lint
-
       - name: Check the types
         run: pnpm run typecheck
+
+      - name: Lint the code
+        run: pnpm run lint
 
       - name: Run the tests
         run: pnpm run test

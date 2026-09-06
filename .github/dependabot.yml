@@ -46,6 +46,18 @@ updates:
       # Reason: TypeScript 7 is not compatible with "typescript-eslint" yet
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
+
+      # Reason: ESLint 10 is not compatible with some ESLint plugins yet
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+
+      # Reason: ESLint 10 is not compatible with some ESLint plugins yet
+      - dependency-name: "@eslint/js"
+        update-types: ["version-update:semver-major"]
+
+      # Reason: We need to use the same version pulled by Semantic Release
+      - dependency-name: "conventional-changelog-conventionalcommits"
+        update-types: ["version-update:semver-major"]
     open-pull-requests-limit: 5
     commit-message:
       prefix: "chore"
