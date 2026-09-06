@@ -1,11 +1,15 @@
 import { browser, type Browser } from "#imports";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import type { AtlassianEntry } from "@/types/atlassian";
-import { buildHarFile, parseHarFile } from "@/utils/har-utils";
+import type { EditableRequest } from "@/types/request-editor";
 import { parseHarEntry } from "@/utils/atlassian-utils";
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { buildHarFile, parseHarFile } from "@/utils/har-utils";
+import { resendRequest, sendRequest } from "@/utils/request-utils";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import RequestDetails from "./request-details/RequestDetails.lazy";
 import RequestDetailsSkeleton from "./request-details/RequestDetails.skeleton";
+import RequestEditor from "./request-editor/RequestEditor.lazy";
+import RequestEditorSkeleton from "./request-editor/RequestEditor.skeleton";
 import RequestList from "./request-list/RequestList.lazy";
 import RequestListSkeleton from "./request-list/RequestList.skeleton";
 import Toolbar from "./toolbar/Toolbar";
@@ -14,6 +18,9 @@ function App() {
   const [filter, setFilter] = useState("");
   const [requests, setRequests] = useState<AtlassianEntry[]>([]);
   const [selectedRequest, setSelectedRequest] = useState<AtlassianEntry>();
+  const [editedRequest, setEditedRequest] = useState<AtlassianEntry>();
+  const [isSending, setIsSending] = useState(false);
+  const shouldSelectNextRequest = useRef(false);
 
   const handleFilterChange = useCallback((value: string) => {
     setFilter(value);
@@ -32,11 +39,45 @@ function App() {
     setSelectedRequest(undefined);
   }, []);
 
+  const handleResendRequest = useCallback((request: AtlassianEntry) => {
+    setIsSending(true);
+    shouldSelectNextRequest.current = true;
+    resendRequest(request)
+      .catch((error) => {
+        shouldSelectNextRequest.current = false;
+        console.error("Failed to resend the request:", error);
+      })
+      .finally(() => setIsSending(false));
+  }, []);
+
+  const handleEditRequest = useCallback((request: AtlassianEntry) => {
+    setEditedRequest(request);
+  }, []);
+
+  const handleCloseRequestEditor = useCallback(() => {
+    setEditedRequest(undefined);
+  }, []);
+
+  const handleSubmitRequestEditor = useCallback((request: AtlassianEntry, editableRequest: EditableRequest) => {
+    setIsSending(true);
+    shouldSelectNextRequest.current = true;
+    sendRequest(request, editableRequest)
+      .catch((error) => {
+        shouldSelectNextRequest.current = false;
+        console.error("Failed to send the request:", error);
+      })
+      .finally(() => setIsSending(false));
+  }, []);
+
   const handleRequestFinished = useCallback((request: Browser.devtools.network.Request) => {
     parseHarEntry(request)
       .then((parsedEntry) => {
         if (parsedEntry != null) {
           setRequests((entries) => [...entries, parsedEntry]);
+          if (shouldSelectNextRequest.current) {
+            shouldSelectNextRequest.current = false;
+            setSelectedRequest(parsedEntry);
+          }
         }
       })
       .catch((error) => console.error("Failed to parse HAR entry:", error));
@@ -95,13 +136,30 @@ function App() {
         onHarExport={handleHarExport}
       />
       <ResizablePanelGroup orientation="horizontal">
+        {editedRequest != null && (
+          <>
+            <ResizablePanel minSize="10%" className="flex h-full w-full flex-col gap-0 overflow-hidden">
+              <Suspense fallback={<RequestEditorSkeleton />}>
+                <RequestEditor
+                  request={editedRequest}
+                  isSending={isSending}
+                  onSend={handleSubmitRequestEditor}
+                  onClose={handleCloseRequestEditor}
+                />
+              </Suspense>
+            </ResizablePanel>
+            <ResizableHandle className="z-10" />
+          </>
+        )}
         <ResizablePanel minSize="10%" className="flex h-full w-full flex-col gap-0 overflow-hidden">
           <Suspense fallback={<RequestListSkeleton />}>
             <RequestList
               filter={filter}
               requests={requests}
               selectedRequest={selectedRequest}
-              onSelectRequest={handleSelectRequest}
+              onSelect={handleSelectRequest}
+              onResend={handleResendRequest}
+              onEdit={handleEditRequest}
             />
           </Suspense>
         </ResizablePanel>
@@ -110,7 +168,7 @@ function App() {
             <ResizableHandle className="z-10" />
             <ResizablePanel minSize="10%" className="flex h-full w-full flex-col gap-0 overflow-hidden">
               <Suspense fallback={<RequestDetailsSkeleton />}>
-                <RequestDetails request={selectedRequest} onCloseRequest={handleCloseRequest} />
+                <RequestDetails request={selectedRequest} onClose={handleCloseRequest} />
               </Suspense>
             </ResizablePanel>
           </>

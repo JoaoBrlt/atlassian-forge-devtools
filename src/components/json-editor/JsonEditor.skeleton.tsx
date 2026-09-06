@@ -18,7 +18,7 @@ const LINE_WIDTHS = [
   "10%",
 ];
 
-function JsonViewerSkeleton() {
+function JsonEditorSkeleton() {
   return (
     <div className="flex flex-col gap-2 p-2">
       {LINE_WIDTHS.map((width, index) => (
@@ -34,4 +34,4 @@ function JsonViewerSkeleton() {
   );
 }
 
-export default JsonViewerSkeleton;
+export default JsonEditorSkeleton;
