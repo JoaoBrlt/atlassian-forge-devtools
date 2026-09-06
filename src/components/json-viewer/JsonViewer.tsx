@@ -36,6 +36,15 @@ const basicSetup: BasicSetupOptions = {
   tabSize: 2,
 };
 
+const editableBasicSetup: BasicSetupOptions = {
+  ...basicSetup,
+  history: true,
+  historyKeymap: true,
+  indentOnInput: true,
+  closeBrackets: true,
+  closeBracketsKeymap: true,
+};
+
 const theme = EditorView.theme(
   {
     // Editor
@@ -203,7 +212,7 @@ const highlightStyle = HighlightStyle.define([
   { tag: tags.null, color: "var(--color-text-discovery)" },
 ]);
 
-const extensions = [
+const editableExtensions = [
   json(),
   foldGutter({
     markerDOM: (open) => {
@@ -220,6 +229,10 @@ const extensions = [
     },
   }),
   syntaxHighlighting(highlightStyle),
+];
+
+const extensions = [
+  ...editableExtensions,
   EditorState.readOnly.of(true),
   EditorView.editable.of(false),
   EditorView.contentAttributes.of({ tabindex: "0" }),
@@ -228,9 +241,10 @@ const extensions = [
 export interface JsonViewerProps extends ReactCodeMirrorProps {
   data: unknown;
   prettify?: boolean;
+  editable?: boolean;
 }
 
-function JsonViewer({ data, prettify = true, ...props }: JsonViewerProps) {
+function JsonViewer({ data, prettify = true, editable = false, ...props }: JsonViewerProps) {
   const value = useMemo(() => {
     try {
       if (prettify) {
@@ -250,8 +264,8 @@ function JsonViewer({ data, prettify = true, ...props }: JsonViewerProps) {
     <CodeMirror
       {...props}
       theme={theme}
-      basicSetup={basicSetup}
-      extensions={extensions}
+      basicSetup={editable ? editableBasicSetup : basicSetup}
+      extensions={editable ? editableExtensions : extensions}
       value={value}
       style={{ height: "100%" }}
     />

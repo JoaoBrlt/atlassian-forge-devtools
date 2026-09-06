@@ -3,6 +3,7 @@ import {
   ContextMenu,
   ContextMenuCheckboxItem,
   ContextMenuContent,
+  ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -34,7 +35,9 @@ export interface RequestListProps {
   filter: string;
   requests: AtlassianEntry[];
   selectedRequest?: AtlassianEntry;
-  onSelectRequest: (request: AtlassianEntry) => void;
+  onSelect: (request: AtlassianEntry) => void;
+  onResend: (request: AtlassianEntry) => void;
+  onEdit: (request: AtlassianEntry) => void;
 }
 
 const features = tableFeatures({
@@ -159,7 +162,7 @@ const filterByPathOrFunctionKey: FilterFn<typeof features, AtlassianEntry> = (ro
   return path.includes(normalizedFilter) || functionKey.includes(normalizedFilter);
 };
 
-function RequestList({ filter, requests, selectedRequest, onSelectRequest }: RequestListProps) {
+function RequestList({ filter, requests, selectedRequest, onSelect, onResend, onEdit }: RequestListProps) {
   const globalFilter = filter ?? "";
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>({
     type: false,
@@ -272,21 +275,34 @@ function RequestList({ filter, requests, selectedRequest, onSelectRequest }: Req
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows.map((row) => (
-            <TableRow
-              key={row.id}
-              className={cn(row.original === selectedRequest && "bg-muted hover:bg-muted")}
-              onClick={() => onSelectRequest(row.original)}
-            >
-              {row.getVisibleCells().map((cell) => (
-                <TableCell
-                  key={cell.id}
-                  className="cursor-pointer truncate border-r border-b border-border p-1 last:border-r-0"
-                  style={{ width: cell.column.getSize() }}
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
+            <ContextMenu key={row.id}>
+              <ContextMenuTrigger
+                render={
+                  <TableRow
+                    className={cn(row.original === selectedRequest && "bg-muted hover:bg-muted")}
+                    onClick={() => onSelect(row.original)}
+                  />
+                }
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell
+                    key={cell.id}
+                    className="cursor-pointer truncate border-r border-b border-border p-1 last:border-r-0"
+                    style={{ width: cell.column.getSize() }}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                <ContextMenuItem className="cursor-pointer" onClick={() => onResend(row.original)}>
+                  Resend
+                </ContextMenuItem>
+                <ContextMenuItem className="cursor-pointer" onClick={() => onEdit(row.original)}>
+                  Edit and resend
+                </ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
           ))}
         </TableBody>
       </Table>

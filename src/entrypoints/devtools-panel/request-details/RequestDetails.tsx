@@ -20,7 +20,7 @@ import TimingsTab from "./tabs/timings/TimingsTab";
 
 export interface RequestDetailsProps {
   request: AtlassianEntry;
-  onCloseRequest: () => void;
+  onClose: () => void;
 }
 
 interface Tab {
@@ -47,7 +47,7 @@ const TABS: Tab[] = [
   },
 ];
 
-function RequestDetails({ request, onCloseRequest }: RequestDetailsProps) {
+function RequestDetails({ request, onClose }: RequestDetailsProps) {
   // State
   const [selectedTab, setSelectedTab] = useState<string>("headers");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -79,7 +79,7 @@ function RequestDetails({ request, onCloseRequest }: RequestDetailsProps) {
     >
       <TabsList ref={containerRef} variant="line" className="w-full justify-start border-b border-border bg-muted">
         <div>
-          <Button size="icon" variant="ghost" title="Close" onClick={onCloseRequest}>
+          <Button size="icon" variant="ghost" title="Close" onClick={onClose}>
             <X />
           </Button>
         </div>
