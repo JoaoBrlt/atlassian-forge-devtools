@@ -1,3 +1,11 @@
+## [1.2.5](https://github.com/JoaoBrlt/atlassian-forge-devtools/compare/v1.2.4...v1.2.5) (2026-09-06)
+
+### :wrench: Chores
+
+* configure Dependabot ([#105](https://github.com/JoaoBrlt/atlassian-forge-devtools/issues/105)) ([915a168](https://github.com/JoaoBrlt/atlassian-forge-devtools/commit/915a168c94fd69408c04037a43a57444a8d933a9))
+* **deps:** bump the all-dependencies group with 29 updates ([#106](https://github.com/JoaoBrlt/atlassian-forge-devtools/issues/106)) ([a37146d](https://github.com/JoaoBrlt/atlassian-forge-devtools/commit/a37146d5e636b812fd587b23839e0f1fb98f40fe))
+* upgrade @tanstack/react-table to v9 ([#108](https://github.com/JoaoBrlt/atlassian-forge-devtools/issues/108)) ([94e23d9](https://github.com/JoaoBrlt/atlassian-forge-devtools/commit/94e23d951094a6d64ced416ddafc866c31aa59f2))
+
 ## [1.2.4](https://github.com/JoaoBrlt/atlassian-forge-devtools/compare/v1.2.3...v1.2.4) (2026-07-30)
 
 ### :bug: Bug Fixes
