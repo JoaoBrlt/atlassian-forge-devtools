@@ -171,7 +171,8 @@ function buildEntry(options?: {
     timings: { send: 0, wait: 150, receive: 0 },
   };
   if (options?.getContent !== undefined) {
-    (entry as Browser.devtools.network.Request).getContent = options.getContent;
+    (entry as Browser.devtools.network.Request).getContent =
+      options.getContent as Browser.devtools.network.Request["getContent"];
   }
   return entry;
 }

@@ -8,6 +8,7 @@ export default {
     [
       "@semantic-release/commit-analyzer",
       {
+        preset: "conventionalcommits",
         releaseRules: [
           { type: "feat", release: "minor" },
           { type: "fix", release: "patch" },
@@ -31,17 +32,17 @@ export default {
         preset: "conventionalcommits",
         presetConfig: {
           types: [
-            { type: "feat", section: ":rocket: Features", effect: "bump" },
-            { type: "fix", section: ":bug: Bug Fixes", effect: "bump" },
-            { type: "build", section: ":package: Build", effect: "bump" },
-            { type: "chore", section: ":wrench: Chores", effect: "bump" },
-            { type: "ci", section: ":robot: CI", effect: "bump" },
-            { type: "docs", section: ":memo: Documentation", effect: "bump" },
-            { type: "perf", section: ":zap: Performance", effect: "bump" },
-            { type: "refactor", section: ":recycle: Refactors", effect: "bump" },
-            { type: "revert", section: ":rewind: Reverts", effect: "bump" },
-            { type: "style", section: ":art: Style", effect: "bump" },
-            { type: "test", section: ":test_tube: Tests", effect: "bump" },
+            { type: "feat", section: ":rocket: Features", hidden: false },
+            { type: "fix", section: ":bug: Bug Fixes", hidden: false },
+            { type: "build", section: ":package: Build", hidden: false },
+            { type: "chore", section: ":wrench: Chores", hidden: false },
+            { type: "ci", section: ":robot: CI", hidden: false },
+            { type: "docs", section: ":memo: Documentation", hidden: false },
+            { type: "perf", section: ":zap: Performance", hidden: false },
+            { type: "refactor", section: ":recycle: Refactors", hidden: false },
+            { type: "revert", section: ":rewind: Reverts", hidden: false },
+            { type: "style", section: ":art: Style", hidden: false },
+            { type: "test", section: ":test_tube: Tests", hidden: false },
           ],
         },
       },
