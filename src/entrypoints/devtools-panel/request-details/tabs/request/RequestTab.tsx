@@ -1,5 +1,5 @@
-import JsonViewer from "@/components/json-viewer/JsonViewer.lazy";
-import JsonViewerSkeleton from "@/components/json-viewer/JsonViewer.skeleton";
+import JsonEditor from "@/components/json-editor/JsonEditor.lazy";
+import JsonEditorSkeleton from "@/components/json-editor/JsonEditor.skeleton";
 import type { AtlassianEntry } from "@/types/atlassian";
 import { Suspense } from "react";
 
@@ -18,8 +18,8 @@ function RequestTab({ request }: RequestTabProps) {
   }
   // Request body
   return (
-    <Suspense fallback={<JsonViewerSkeleton />}>
-      <JsonViewer data={request.parsedRequest.body} />
+    <Suspense fallback={<JsonEditorSkeleton />}>
+      <JsonEditor isReadOnly data={request.parsedRequest.body} />
     </Suspense>
   );
 }

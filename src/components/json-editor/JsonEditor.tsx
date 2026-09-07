@@ -10,7 +10,7 @@ import { useMemo } from "react";
 
 const basicSetup: BasicSetupOptions = {
   highlightSpecialChars: false,
-  history: false,
+  history: true,
   drawSelection: true,
   syntaxHighlighting: true,
   lineNumbers: true,
@@ -18,22 +18,31 @@ const basicSetup: BasicSetupOptions = {
   foldGutter: false,
   dropCursor: false,
   allowMultipleSelections: false,
-  indentOnInput: false,
+  indentOnInput: true,
   bracketMatching: true,
-  closeBrackets: false,
+  closeBrackets: true,
   autocompletion: false,
   rectangularSelection: false,
   crosshairCursor: false,
   highlightActiveLine: false,
   highlightSelectionMatches: true,
   defaultKeymap: true,
-  historyKeymap: false,
+  historyKeymap: true,
   searchKeymap: true,
   foldKeymap: true,
   completionKeymap: false,
-  closeBracketsKeymap: false,
+  closeBracketsKeymap: true,
   lintKeymap: false,
   tabSize: 2,
+};
+
+const readOnlyBasicSetup: BasicSetupOptions = {
+  ...basicSetup,
+  history: false,
+  historyKeymap: false,
+  indentOnInput: false,
+  closeBrackets: false,
+  closeBracketsKeymap: false,
 };
 
 const theme = EditorView.theme(
@@ -95,6 +104,10 @@ const theme = EditorView.theme(
       border: "none",
       color: "var(--color-muted-foreground)",
       backgroundColor: "var(--color-background)",
+    },
+    // Cursor
+    ".cm-cursor, .cm-dropCursor": {
+      borderLeftColor: "var(--color-foreground)",
     },
     // Selection background
     ".cm-selectionBackground, ::selection": {
@@ -220,17 +233,22 @@ const extensions = [
     },
   }),
   syntaxHighlighting(highlightStyle),
+];
+
+const readOnlyExtensions = [
+  ...extensions,
   EditorState.readOnly.of(true),
   EditorView.editable.of(false),
   EditorView.contentAttributes.of({ tabindex: "0" }),
 ];
 
-export interface JsonViewerProps extends ReactCodeMirrorProps {
+export interface JsonEditorProps extends ReactCodeMirrorProps {
   data: unknown;
   prettify?: boolean;
+  isReadOnly?: boolean;
 }
 
-function JsonViewer({ data, prettify = true, ...props }: JsonViewerProps) {
+function JsonEditor({ data, prettify = true, isReadOnly = false, ...props }: JsonEditorProps) {
   const value = useMemo(() => {
     try {
       if (prettify) {
@@ -250,12 +268,12 @@ function JsonViewer({ data, prettify = true, ...props }: JsonViewerProps) {
     <CodeMirror
       {...props}
       theme={theme}
-      basicSetup={basicSetup}
-      extensions={extensions}
+      basicSetup={isReadOnly ? readOnlyBasicSetup : basicSetup}
+      extensions={isReadOnly ? readOnlyExtensions : extensions}
       value={value}
       style={{ height: "100%" }}
     />
   );
 }
 
-export default JsonViewer;
+export default JsonEditor;
