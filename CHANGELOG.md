@@ -1,3 +1,10 @@
+## [1.3.0](https://github.com/JoaoBrlt/atlassian-forge-devtools/compare/v1.2.5...v1.3.0) (2026-09-07)
+
+### :rocket: Features
+
+* improve request path readability ([#109](https://github.com/JoaoBrlt/atlassian-forge-devtools/issues/109)) ([0001031](https://github.com/JoaoBrlt/atlassian-forge-devtools/commit/0001031aaf4219f73608dabcf4bd51c7c83f73a3))
+* support edit and resend requests ([#110](https://github.com/JoaoBrlt/atlassian-forge-devtools/issues/110)) ([77fcbb5](https://github.com/JoaoBrlt/atlassian-forge-devtools/commit/77fcbb541f7ad5aa7d82a26f3ec85372edaa644e))
+
 ## [1.2.5](https://github.com/JoaoBrlt/atlassian-forge-devtools/compare/v1.2.4...v1.2.5) (2026-09-06)
 
 ### :wrench: Chores
