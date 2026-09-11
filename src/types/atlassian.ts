@@ -22,6 +22,7 @@ export interface AtlassianFunctionRequest<RequestType = unknown> {
   functionKey: string;
   body?: RequestType;
   context: AtlassianRequestContext;
+  trpc?: AtlassianTrpcCall;
 }
 
 /**
@@ -34,6 +35,15 @@ export interface AtlassianRemoteRequest<RequestType = unknown> {
   headers?: Record<string, string>;
   body?: RequestType;
   context: AtlassianRequestContext;
+  trpc?: AtlassianTrpcCall;
+}
+
+/**
+ * Represents a tRPC procedure call embedded in the body of a Forge extension invocation request.
+ */
+export interface AtlassianTrpcCall {
+  type: "query" | "mutation";
+  path: string;
 }
 
 /**

@@ -1155,4 +1155,73 @@ describe("parseHarEntry", () => {
       });
     });
   });
+
+  describe("tRPC calls", () => {
+    const trpcBody = {
+      type: "query",
+      path: "settings.time.getTimeSettings",
+      input: { json: null, meta: { values: ["undefined"] } },
+      isBatchCall: false,
+    };
+
+    it("should detect a tRPC call in a function invocation payload", async () => {
+      const entry = buildFunctionEntry({
+        call: buildFunctionCall({ payload: trpcBody }),
+        responseText: buildFunctionSuccessResponse(),
+      });
+      const result = await parseHarEntry(entry);
+      expect(result).not.toBeNull();
+      expect(result!.parsedRequest).toMatchObject({
+        type: "invoke",
+        trpc: { type: "query", path: "settings.time.getTimeSettings" },
+      });
+    });
+
+    it("should detect a tRPC call in a remote invocation body", async () => {
+      const entry = buildRemoteEntry({
+        call: buildRemoteCall({ body: { ...trpcBody, type: "mutation" } }),
+        responseText: buildRemoteSuccessResponse({ status: 200, headers: {} }),
+      });
+      const result = await parseHarEntry(entry);
+      expect(result).not.toBeNull();
+      expect(result!.parsedRequest).toMatchObject({
+        type: "invokeRemote",
+        trpc: { type: "mutation", path: "settings.time.getTimeSettings" },
+      });
+    });
+
+    it("should leave trpc undefined when the function payload is not a tRPC call", async () => {
+      const entry = buildFunctionEntry({ responseText: buildFunctionSuccessResponse() });
+      const result = await parseHarEntry(entry);
+      expect(result).not.toBeNull();
+      expect((result!.parsedRequest as { trpc?: unknown }).trpc).toBeUndefined();
+    });
+
+    it("should leave trpc undefined when the remote body is not a tRPC call", async () => {
+      const entry = buildRemoteEntry({ responseText: buildRemoteSuccessResponse({ status: 200, headers: {} }) });
+      const result = await parseHarEntry(entry);
+      expect(result).not.toBeNull();
+      expect((result!.parsedRequest as { trpc?: unknown }).trpc).toBeUndefined();
+    });
+
+    it("should leave trpc undefined when type is not query or mutation", async () => {
+      const entry = buildFunctionEntry({
+        call: buildFunctionCall({ payload: { ...trpcBody, type: "subscription" } }),
+        responseText: buildFunctionSuccessResponse(),
+      });
+      const result = await parseHarEntry(entry);
+      expect(result).not.toBeNull();
+      expect((result!.parsedRequest as { trpc?: unknown }).trpc).toBeUndefined();
+    });
+
+    it("should leave trpc undefined when isBatchCall is missing", async () => {
+      const entry = buildFunctionEntry({
+        call: buildFunctionCall({ payload: { type: "query", path: "settings.time.getTimeSettings" } }),
+        responseText: buildFunctionSuccessResponse(),
+      });
+      const result = await parseHarEntry(entry);
+      expect(result).not.toBeNull();
+      expect((result!.parsedRequest as { trpc?: unknown }).trpc).toBeUndefined();
+    });
+  });
 });

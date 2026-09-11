@@ -14,7 +14,9 @@ import type {
   AtlassianRemoteResponse,
   AtlassianRequest,
   AtlassianResponse,
+  AtlassianTrpcCall,
 } from "@/types/atlassian";
+import { TrpcCallSchema } from "@/schemas/trpc";
 import { base64ToString, isBlank, isNotBlank } from "@/utils/string-utils";
 import type { Entry } from "har-format";
 
@@ -85,6 +87,7 @@ function parseRequest(entry: Entry | Browser.devtools.network.Request): Atlassia
       functionKey: payload.call.functionKey,
       body: payload.call.payload,
       context: parseRequestContext(validatedRequest),
+      trpc: parseTrpcCall(payload.call.payload),
     };
   }
 
@@ -96,6 +99,23 @@ function parseRequest(entry: Entry | Browser.devtools.network.Request): Atlassia
     headers: payload.call.headers ?? undefined,
     body: payload.call.body,
     context: parseRequestContext(validatedRequest),
+    trpc: parseTrpcCall(payload.call.body),
+  };
+}
+
+/**
+ * Parses a tRPC procedure call from a Forge extension invocation request body, if present.
+ * @param body the request body to check
+ * @return the parsed tRPC call, or undefined if the body is not a tRPC procedure call
+ */
+function parseTrpcCall(body: unknown): AtlassianTrpcCall | undefined {
+  const result = TrpcCallSchema.safeParse(body);
+  if (!result.success) {
+    return undefined;
+  }
+  return {
+    type: result.data.type,
+    path: result.data.path,
   };
 }
 

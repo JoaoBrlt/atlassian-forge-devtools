@@ -81,6 +81,16 @@ const columns = columnHelper.columns([
     header: "Path",
     size: 160,
   }),
+  columnHelper.accessor("parsedRequest.trpc.type", {
+    id: "trpcType",
+    header: "tRPC Type",
+    size: 80,
+  }),
+  columnHelper.accessor("parsedRequest.trpc.path", {
+    id: "trpcPath",
+    header: "tRPC Path",
+    size: 220,
+  }),
   columnHelper.accessor("parsedRequest.context.siteUrl", {
     id: "siteUrl",
     header: "Site URL",
@@ -159,7 +169,10 @@ const filterByPathOrFunctionKey: FilterFn<typeof features, AtlassianEntry> = (ro
   }
   const path = (row.getValue<string>("path") ?? "").toLowerCase();
   const functionKey = (row.getValue<string>("functionKey") ?? "").toLowerCase();
-  return path.includes(normalizedFilter) || functionKey.includes(normalizedFilter);
+  const trpcPath = (row.getValue<string>("trpcPath") ?? "").toLowerCase();
+  return (
+    path.includes(normalizedFilter) || functionKey.includes(normalizedFilter) || trpcPath.includes(normalizedFilter)
+  );
 };
 
 function RequestList({ filter, requests, selectedRequest, onSelect, onResend, onEdit }: RequestListProps) {
@@ -170,6 +183,8 @@ function RequestList({ filter, requests, selectedRequest, onSelect, onResend, on
     functionKey: true,
     method: true,
     path: true,
+    trpcType: false,
+    trpcPath: false,
     siteUrl: false,
     cloudId: false,
     appVersion: false,
