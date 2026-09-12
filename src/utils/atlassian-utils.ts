@@ -8,15 +8,20 @@ import {
   AtlassianInvokeExtensionRequestSchema,
   AtlassianRequestHarEntrySchema,
 } from "@/schemas/atlassian";
+import {
+  type ForgeTrpcRequest,
+  ForgeTrpcRequestSchema,
+  type ForgeTrpcResponse,
+  ForgeTrpcResponseSchema,
+} from "@/schemas/forge-trpc";
 import type {
   AtlassianEntry,
+  AtlassianFunctionRequest,
   AtlassianFunctionResponse,
   AtlassianRemoteResponse,
   AtlassianRequest,
   AtlassianResponse,
-  AtlassianTrpcCall,
 } from "@/types/atlassian";
-import { TrpcCallSchema } from "@/schemas/trpc";
 import { base64ToString, isBlank, isNotBlank } from "@/utils/string-utils";
 import type { Entry } from "har-format";
 
@@ -87,7 +92,7 @@ function parseRequest(entry: Entry | Browser.devtools.network.Request): Atlassia
       functionKey: payload.call.functionKey,
       body: payload.call.payload,
       context: parseRequestContext(validatedRequest),
-      trpc: parseTrpcCall(payload.call.payload),
+      trpc: parseForgeTrpcRequest(payload.call.payload),
     };
   }
 
@@ -99,23 +104,6 @@ function parseRequest(entry: Entry | Browser.devtools.network.Request): Atlassia
     headers: payload.call.headers ?? undefined,
     body: payload.call.body,
     context: parseRequestContext(validatedRequest),
-    trpc: parseTrpcCall(payload.call.body),
-  };
-}
-
-/**
- * Parses a tRPC procedure call from a Forge extension invocation request body, if present.
- * @param body the request body to check
- * @return the parsed tRPC call, or undefined if the body is not a tRPC procedure call
- */
-function parseTrpcCall(body: unknown): AtlassianTrpcCall | undefined {
-  const result = TrpcCallSchema.safeParse(body);
-  if (!result.success) {
-    return undefined;
-  }
-  return {
-    type: result.data.type,
-    path: result.data.path,
   };
 }
 
@@ -138,6 +126,19 @@ function parseRequestContext(request: AtlassianInvokeExtensionRequest) {
     moduleKey: payload.context?.moduleKey ?? undefined,
     localId: payload.context?.localId ?? undefined,
   };
+}
+
+/**
+ * Parses a Forge tRPC request from the body of an Atlassian Forge Function invocation.
+ * @param body the body of the Atlassian Forge Function invocation
+ * @return the parsed Forge tRPC request, or undefined if the body is not a Forge tRPC request
+ */
+function parseForgeTrpcRequest(body: unknown): ForgeTrpcRequest | undefined {
+  const result = ForgeTrpcRequestSchema.safeParse(body);
+  if (!result.success) {
+    return undefined;
+  }
+  return result.data;
 }
 
 /**
@@ -202,7 +203,7 @@ function parseResponse(
 ): AtlassianResponse {
   switch (parsedRequest.type) {
     case "invoke":
-      return parseFunctionResponse(entry, responseBody);
+      return parseFunctionResponse(entry, parsedRequest, responseBody);
     case "invokeRemote":
       return parseRemoteResponse(entry, responseBody);
   }
@@ -211,12 +212,14 @@ function parseResponse(
 /**
  * Parses the Atlassian response from an Atlassian Forge extension function invocation (function call).
  * @param entry the HAR entry of the Atlassian Forge extension function invocation
+ * @param parsedRequest the parsed Atlassian request
  * @param responseBody the response body of the HAR entry
  * @return the parsed Atlassian response
  * @throws Error if unable to parse the Atlassian response from the HAR entry
  */
 function parseFunctionResponse(
   entry: Entry | Browser.devtools.network.Request,
+  parsedRequest: AtlassianFunctionRequest,
   responseBody: string,
 ): AtlassianFunctionResponse {
   // Parse the response body
@@ -282,7 +285,21 @@ function parseFunctionResponse(
     transferredSize: entry.response._transferSize ?? entry.response.content.size,
     size: entry.response.content.size,
     duration: entry.time,
+    trpc: parsedRequest.trpc != null ? parseForgeTrpcResponse(response.body) : undefined,
   };
+}
+
+/**
+ * Parses a Forge tRPC response from the body of an Atlassian Forge Function invocation.
+ * @param body the body of the Atlassian Forge Function invocation
+ * @return the parsed Forge tRPC response, or undefined if the body is not a Forge tRPC response
+ */
+function parseForgeTrpcResponse(body: unknown): ForgeTrpcResponse | undefined {
+  const result = ForgeTrpcResponseSchema.safeParse(body);
+  if (!result.success) {
+    return undefined;
+  }
+  return result.data;
 }
 
 /**

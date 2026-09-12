@@ -1,4 +1,5 @@
 import ResponseStatusBadge from "@/components/response-status-badge/ResponseStatusBadge";
+import TrpcResponseStatusBadge from "@/components/trpc-response-status-badge/TrpcResponseStatusBadge";
 import {
   ContextMenu,
   ContextMenuCheckboxItem,
@@ -52,11 +53,6 @@ const features = tableFeatures({
 const columnHelper = createColumnHelper<typeof features, AtlassianEntry>();
 
 const columns = columnHelper.columns([
-  columnHelper.accessor("parsedRequest.type", {
-    id: "type",
-    header: "Type",
-    size: 90,
-  }),
   columnHelper.accessor("parsedResponse.status", {
     id: "status",
     header: "Status",
@@ -65,6 +61,11 @@ const columns = columnHelper.columns([
       const entry = props.row.original;
       return <ResponseStatusBadge response={entry.parsedResponse} />;
     },
+  }),
+  columnHelper.accessor("parsedRequest.type", {
+    id: "type",
+    header: "Type",
+    size: 90,
   }),
   columnHelper.accessor("parsedRequest.functionKey", {
     id: "functionKey",
@@ -81,6 +82,15 @@ const columns = columnHelper.columns([
     header: "Path",
     size: 160,
   }),
+  columnHelper.accessor("parsedRequest.trpc", {
+    id: "trpcStatus",
+    header: "tRPC Status",
+    size: 80,
+    cell: (props) => {
+      const entry = props.row.original;
+      return <TrpcResponseStatusBadge response={entry.parsedResponse} />;
+    },
+  }),
   columnHelper.accessor("parsedRequest.trpc.type", {
     id: "trpcType",
     header: "tRPC Type",
@@ -89,7 +99,7 @@ const columns = columnHelper.columns([
   columnHelper.accessor("parsedRequest.trpc.path", {
     id: "trpcPath",
     header: "tRPC Path",
-    size: 220,
+    size: 160,
   }),
   columnHelper.accessor("parsedRequest.context.siteUrl", {
     id: "siteUrl",

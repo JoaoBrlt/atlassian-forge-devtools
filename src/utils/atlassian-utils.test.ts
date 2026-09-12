@@ -1,3 +1,4 @@
+import type { AtlassianEntry, AtlassianFunctionRequest, AtlassianFunctionSuccessResponse } from "@/types/atlassian";
 import type { Entry } from "har-format";
 import { describe, expect, it } from "vitest";
 import { parseHarEntry } from "./atlassian-utils";
@@ -122,6 +123,24 @@ function buildRemoteMissingSuccessPayload(): string {
   });
 }
 
+function buildTrpcCallPayload(overrides?: Record<string, unknown>) {
+  return {
+    type: "query",
+    path: "issue.getById",
+    input: { id: "PROJ-1" },
+    isBatchCall: false,
+    ...overrides,
+  };
+}
+
+function getRequestTrpc(entry: AtlassianEntry) {
+  return (entry.parsedRequest as AtlassianFunctionRequest).trpc;
+}
+
+function getResponseTrpc(entry: AtlassianEntry) {
+  return (entry.parsedResponse as AtlassianFunctionSuccessResponse).trpc;
+}
+
 function buildEntry(options?: {
   method?: string;
   url?: string;
@@ -218,6 +237,15 @@ function buildRemoteEntry(options?: {
     omitTransferSize: options?.omitTransferSize,
     time: options?.time,
     getContent: options?.getContent,
+  });
+}
+
+function buildTrpcEntry(options?: { payload?: unknown; responseBody?: unknown; responseText?: string }): Entry {
+  const payload = options && "payload" in options ? options.payload : buildTrpcCallPayload();
+  const responseBody = options && "responseBody" in options ? options.responseBody : { result: { data: "ok" } };
+  return buildFunctionEntry({
+    call: buildFunctionCall({ functionKey: "trpc-handler", payload }),
+    responseText: options?.responseText ?? buildFunctionSuccessResponse(responseBody),
   });
 }
 
@@ -1155,73 +1183,386 @@ describe("parseHarEntry", () => {
       });
     });
   });
-
-  describe("tRPC calls", () => {
-    const trpcBody = {
-      type: "query",
-      path: "settings.time.getTimeSettings",
-      input: { json: null, meta: { values: ["undefined"] } },
-      isBatchCall: false,
-    };
-
-    it("should detect a tRPC call in a function invocation payload", async () => {
-      const entry = buildFunctionEntry({
-        call: buildFunctionCall({ payload: trpcBody }),
-        responseText: buildFunctionSuccessResponse(),
+  describe("Forge tRPC invocations", () => {
+    describe("tRPC requests", () => {
+      it("should parse a query procedure call", async () => {
+        const entry = buildTrpcEntry({
+          payload: buildTrpcCallPayload({ type: "query", path: "issue.getById", input: { id: "PROJ-1" } }),
+        });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toEqual({
+          type: "query",
+          path: "issue.getById",
+          input: { id: "PROJ-1" },
+          isBatchCall: false,
+        });
       });
-      const result = await parseHarEntry(entry);
-      expect(result).not.toBeNull();
-      expect(result!.parsedRequest).toMatchObject({
-        type: "invoke",
-        trpc: { type: "query", path: "settings.time.getTimeSettings" },
+
+      it("should parse a mutation procedure call", async () => {
+        const entry = buildTrpcEntry({
+          payload: buildTrpcCallPayload({ type: "mutation", path: "issue.create", input: { summary: "Bug" } }),
+        });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toEqual({
+          type: "mutation",
+          path: "issue.create",
+          input: { summary: "Bug" },
+          isBatchCall: false,
+        });
+      });
+
+      it("should parse a subscription procedure call", async () => {
+        const entry = buildTrpcEntry({
+          payload: buildTrpcCallPayload({ type: "subscription", path: "issue.onUpdate" }),
+        });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toMatchObject({ type: "subscription", path: "issue.onUpdate" });
+      });
+
+      it("should parse a batched procedure call", async () => {
+        const entry = buildTrpcEntry({ payload: buildTrpcCallPayload({ isBatchCall: true }) });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toMatchObject({ isBatchCall: true });
+      });
+
+      it("should parse a procedure call without input", async () => {
+        const entry = buildTrpcEntry({ payload: buildTrpcCallPayload({ input: undefined }) });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toEqual({ type: "query", path: "issue.getById", isBatchCall: false });
+        expect(getRequestTrpc(result!)?.input).toBeUndefined();
+      });
+
+      it("should parse a procedure call with a null input", async () => {
+        const entry = buildTrpcEntry({ payload: buildTrpcCallPayload({ input: null }) });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toMatchObject({ input: null });
+      });
+
+      it("should parse a procedure call with a primitive input", async () => {
+        const entry = buildTrpcEntry({ payload: buildTrpcCallPayload({ input: "PROJ-1" }) });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toMatchObject({ input: "PROJ-1" });
+      });
+
+      it("should parse a procedure call with an array input", async () => {
+        const entry = buildTrpcEntry({ payload: buildTrpcCallPayload({ input: [1, 2, 3] }) });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toMatchObject({ input: [1, 2, 3] });
+      });
+
+      it("should parse an empty procedure path", async () => {
+        const entry = buildTrpcEntry({ payload: buildTrpcCallPayload({ path: "" }) });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toMatchObject({ path: "" });
+      });
+
+      it("should ignore the unknown properties of a procedure call", async () => {
+        const entry = buildTrpcEntry({ payload: buildTrpcCallPayload({ context: { traceId: "trace-1" } }) });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toEqual({
+          type: "query",
+          path: "issue.getById",
+          input: { id: "PROJ-1" },
+          isBatchCall: false,
+        });
+      });
+
+      it("should keep the function key and the raw payload of a procedure call", async () => {
+        const payload = buildTrpcCallPayload({ context: { traceId: "trace-1" } });
+        const entry = buildTrpcEntry({ payload });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(result!.parsedRequest).toMatchObject({
+          type: "invoke",
+          functionKey: "trpc-handler",
+          body: payload,
+        });
       });
     });
 
-    it("should detect a tRPC call in a remote invocation body", async () => {
-      const entry = buildRemoteEntry({
-        call: buildRemoteCall({ body: { ...trpcBody, type: "mutation" } }),
-        responseText: buildRemoteSuccessResponse({ status: 200, headers: {} }),
+    describe("non-tRPC requests", () => {
+      it("should not parse a tRPC request when the function payload is missing", async () => {
+        const entry = buildTrpcEntry({ payload: undefined });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toBeUndefined();
       });
-      const result = await parseHarEntry(entry);
-      expect(result).not.toBeNull();
-      expect(result!.parsedRequest).toMatchObject({
-        type: "invokeRemote",
-        trpc: { type: "mutation", path: "settings.time.getTimeSettings" },
+
+      it("should not parse a tRPC request when the function payload is null", async () => {
+        const entry = buildTrpcEntry({ payload: null });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC request when the function payload is a string", async () => {
+        const entry = buildTrpcEntry({ payload: "issue.getById" });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC request when the function payload is a number", async () => {
+        const entry = buildTrpcEntry({ payload: 42 });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC request when the function payload is an array", async () => {
+        const entry = buildTrpcEntry({ payload: [buildTrpcCallPayload()] });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC request when the function payload has no tRPC fields", async () => {
+        const entry = buildTrpcEntry({ payload: { input: "data" } });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC request when the procedure type is missing", async () => {
+        const entry = buildTrpcEntry({ payload: buildTrpcCallPayload({ type: undefined }) });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC request when the procedure type is unknown", async () => {
+        const entry = buildTrpcEntry({ payload: buildTrpcCallPayload({ type: "QUERY" }) });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC request when the procedure path is missing", async () => {
+        const entry = buildTrpcEntry({ payload: buildTrpcCallPayload({ path: undefined }) });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC request when the procedure path is not a string", async () => {
+        const entry = buildTrpcEntry({ payload: buildTrpcCallPayload({ path: ["issue", "getById"] }) });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC request when the batch flag is missing", async () => {
+        const entry = buildTrpcEntry({ payload: buildTrpcCallPayload({ isBatchCall: undefined }) });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC request when the batch flag is not a boolean", async () => {
+        const entry = buildTrpcEntry({ payload: buildTrpcCallPayload({ isBatchCall: "false" }) });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC request for a remote invocation", async () => {
+        const entry = buildRemoteEntry({
+          call: buildRemoteCall({ body: buildTrpcCallPayload() }),
+          responseText: buildRemoteSuccessResponse({ status: 200, headers: {} }),
+        });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getRequestTrpc(result!)).toBeUndefined();
       });
     });
 
-    it("should leave trpc undefined when the function payload is not a tRPC call", async () => {
-      const entry = buildFunctionEntry({ responseText: buildFunctionSuccessResponse() });
-      const result = await parseHarEntry(entry);
-      expect(result).not.toBeNull();
-      expect((result!.parsedRequest as { trpc?: unknown }).trpc).toBeUndefined();
-    });
-
-    it("should leave trpc undefined when the remote body is not a tRPC call", async () => {
-      const entry = buildRemoteEntry({ responseText: buildRemoteSuccessResponse({ status: 200, headers: {} }) });
-      const result = await parseHarEntry(entry);
-      expect(result).not.toBeNull();
-      expect((result!.parsedRequest as { trpc?: unknown }).trpc).toBeUndefined();
-    });
-
-    it("should leave trpc undefined when type is not query or mutation", async () => {
-      const entry = buildFunctionEntry({
-        call: buildFunctionCall({ payload: { ...trpcBody, type: "subscription" } }),
-        responseText: buildFunctionSuccessResponse(),
+    describe("tRPC responses", () => {
+      it("should parse a procedure result", async () => {
+        const entry = buildTrpcEntry({ responseBody: { result: { data: { id: "PROJ-1", summary: "Bug" } } } });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toEqual({ result: { data: { id: "PROJ-1", summary: "Bug" } } });
       });
-      const result = await parseHarEntry(entry);
-      expect(result).not.toBeNull();
-      expect((result!.parsedRequest as { trpc?: unknown }).trpc).toBeUndefined();
+
+      it("should parse a procedure result without data", async () => {
+        const entry = buildTrpcEntry({ responseBody: { result: {} } });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toEqual({ result: {} });
+      });
+
+      it("should parse a procedure result with a null data", async () => {
+        const entry = buildTrpcEntry({ responseBody: { result: { data: null } } });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toEqual({ result: { data: null } });
+      });
+
+      it("should parse a procedure result with a primitive data", async () => {
+        const entry = buildTrpcEntry({ responseBody: { result: { data: "ok" } } });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toEqual({ result: { data: "ok" } });
+      });
+
+      it("should parse a procedure result with an array data", async () => {
+        const entry = buildTrpcEntry({ responseBody: { result: { data: [{ id: "PROJ-1" }] } } });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toEqual({ result: { data: [{ id: "PROJ-1" }] } });
+      });
+
+      it("should parse a procedure error", async () => {
+        const error = { message: "Not found", code: -32004, data: { httpStatus: 404 } };
+        const entry = buildTrpcEntry({ responseBody: { error } });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toEqual({ error });
+      });
+
+      it("should parse a null procedure error", async () => {
+        const entry = buildTrpcEntry({ responseBody: { error: null } });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toEqual({ error: null });
+      });
+
+      it("should ignore the unknown properties of a procedure result", async () => {
+        const entry = buildTrpcEntry({
+          responseBody: { result: { data: "ok", type: "data" }, id: 1 },
+        });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toEqual({ result: { data: "ok" } });
+      });
+
+      it("should give precedence to the procedure error over the procedure result", async () => {
+        const entry = buildTrpcEntry({
+          responseBody: { error: { message: "Not found" }, result: { data: "ok" } },
+        });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toEqual({ error: { message: "Not found" } });
+      });
+
+      it("should keep the raw response body of a procedure call", async () => {
+        const responseBody = { result: { data: "ok" }, id: 1 };
+        const entry = buildTrpcEntry({ responseBody });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(result!.parsedResponse).toMatchObject({ type: "invoke", success: true, body: responseBody });
+      });
     });
 
-    it("should leave trpc undefined when isBatchCall is missing", async () => {
-      const entry = buildFunctionEntry({
-        call: buildFunctionCall({ payload: { type: "query", path: "settings.time.getTimeSettings" } }),
-        responseText: buildFunctionSuccessResponse(),
+    describe("non-tRPC responses", () => {
+      it("should not parse a tRPC response when the request is not a tRPC request", async () => {
+        const entry = buildTrpcEntry({ payload: { input: "data" }, responseBody: { result: { data: "ok" } } });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toBeUndefined();
       });
-      const result = await parseHarEntry(entry);
-      expect(result).not.toBeNull();
-      expect((result!.parsedRequest as { trpc?: unknown }).trpc).toBeUndefined();
+
+      it("should not parse a tRPC response when the response body is missing", async () => {
+        const entry = buildTrpcEntry({
+          responseText: JSON.stringify({ data: { invokeExtension: { success: true, response: {} } } }),
+        });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC response when the response body is null", async () => {
+        const entry = buildTrpcEntry({ responseBody: null });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC response when the response body is a string", async () => {
+        const entry = buildTrpcEntry({ responseBody: "ok" });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC response when the response body is a number", async () => {
+        const entry = buildTrpcEntry({ responseBody: 42 });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC response when the response body is an array", async () => {
+        const entry = buildTrpcEntry({ responseBody: [{ result: { data: "ok" } }] });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC response when the response body is an empty object", async () => {
+        const entry = buildTrpcEntry({ responseBody: {} });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC response when the procedure result is null", async () => {
+        const entry = buildTrpcEntry({ responseBody: { result: null } });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC response when the procedure result is not an object", async () => {
+        const entry = buildTrpcEntry({ responseBody: { result: "ok" } });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC response when the invocation failed", async () => {
+        const entry = buildTrpcEntry({
+          responseText: buildFunctionErrorResponse([
+            { message: "Unauthorized", extensions: { errorType: "AUTH_ERROR", statusCode: 401 } },
+          ]),
+        });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(result!.parsedResponse).toMatchObject({ type: "invoke", success: false });
+        expect(getResponseTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC response when the response payload is missing", async () => {
+        const entry = buildTrpcEntry({ responseText: buildFunctionMissingResponsePayload() });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(result!.parsedResponse).toMatchObject({ type: "invoke", success: false });
+        expect(getResponseTrpc(result!)).toBeUndefined();
+      });
+
+      it("should not parse a tRPC response for a remote invocation", async () => {
+        const entry = buildRemoteEntry({
+          call: buildRemoteCall({ body: buildTrpcCallPayload() }),
+          responseText: buildRemoteSuccessResponse({
+            status: 200,
+            headers: {},
+            body: { result: { data: "ok" } },
+          }),
+        });
+        const result = await parseHarEntry(entry);
+        expect(result).not.toBeNull();
+        expect(getResponseTrpc(result!)).toBeUndefined();
+      });
     });
   });
 });
