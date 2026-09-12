@@ -1,3 +1,13 @@
+## [1.4.0](https://github.com/JoaoBrlt/atlassian-forge-devtools/compare/v1.3.0...v1.4.0) (2026-09-12)
+
+### :rocket: Features
+
+* add Forge tRPC support ([#112](https://github.com/JoaoBrlt/atlassian-forge-devtools/issues/112)) ([47b7336](https://github.com/JoaoBrlt/atlassian-forge-devtools/commit/47b7336dc519187387a78de2eede6ea75730059f))
+
+### :memo: Documentation
+
+* improve the documentation ([80dfca9](https://github.com/JoaoBrlt/atlassian-forge-devtools/commit/80dfca9ff3dcfa7c12100a51707806dece7ef8f1))
+
 ## [1.3.0](https://github.com/JoaoBrlt/atlassian-forge-devtools/compare/v1.2.5...v1.3.0) (2026-09-07)
 
 ### :rocket: Features
