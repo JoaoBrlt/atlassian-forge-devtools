@@ -1,40 +1,16 @@
+import ResponseStatusBadge from "@/components/response-status-badge/ResponseStatusBadge";
+import TrpcResponseStatusBadge from "@/components/trpc-response-status-badge/TrpcResponseStatusBadge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
 import type { AtlassianEntry } from "@/types/atlassian";
-import { getSafeStatusText, parseUrl } from "@/utils/http-utils";
+import { isForgeTrpcRequest } from "@/utils/forge-trpc-utils";
+import { parseUrl } from "@/utils/http-utils";
 import { formatSize } from "@/utils/size-utils";
 import { formatDuration } from "@/utils/time-utils";
 import RequestDetailRow, { type RequestDetail } from "./request-detail-row/RequestDetailRow";
 
 export interface HeadersTabProps {
   request: AtlassianEntry;
-}
-
-function getStatusColor(status: number) {
-  if (status >= 100 && status <= 399) {
-    return "var(--color-text-success)";
-  }
-  if (status >= 400 && status <= 599) {
-    return "var(--color-text-destructive)";
-  }
-  return "var(--color-text-info)";
-}
-
-function getResponseStatus(entry: AtlassianEntry) {
-  if (entry.parsedResponse.type === "invokeRemote") {
-    if (entry.parsedResponse.success) {
-      return (
-        <p className="font-semibold" style={{ color: getStatusColor(entry.parsedResponse.status) }}>
-          {entry.parsedResponse.status} {getSafeStatusText(entry.parsedResponse.status)}
-        </p>
-      );
-    }
-    return <p className="font-semibold text-text-destructive">Failed</p>;
-  }
-  if (entry.parsedResponse.success) {
-    return <p className="font-semibold text-text-success">Success</p>;
-  }
-  return <p className="font-semibold text-text-destructive">Failed</p>;
 }
 
 function getPathParts(pathString: string): RequestDetail[] {
@@ -69,7 +45,7 @@ function getGeneralDetails(entry: AtlassianEntry): RequestDetail[] {
     },
     {
       name: "Status",
-      value: getResponseStatus(entry),
+      value: <ResponseStatusBadge response={entry.parsedResponse} />,
     },
     {
       name: "Transferred Size",
@@ -82,6 +58,26 @@ function getGeneralDetails(entry: AtlassianEntry): RequestDetail[] {
     {
       name: "Time",
       value: formatDuration(entry.parsedResponse.duration),
+    },
+  ];
+}
+
+function getForgeTrpcDetails(entry: AtlassianEntry): RequestDetail[] {
+  if (!isForgeTrpcRequest(entry.parsedRequest)) {
+    return [];
+  }
+  return [
+    {
+      name: "tRPC Type",
+      value: entry.parsedRequest.trpc.type,
+    },
+    {
+      name: "tRPC Path",
+      value: entry.parsedRequest.trpc.path,
+    },
+    {
+      name: "tRPC Status",
+      value: <TrpcResponseStatusBadge response={entry.parsedResponse} />,
     },
   ];
 }
@@ -128,12 +124,9 @@ function getContextDetails(entry: AtlassianEntry): RequestDetail[] {
 }
 
 function HeadersTab({ request }: HeadersTabProps) {
-  const generalDetails = getGeneralDetails(request).filter((item) => item.value != null);
-  const contextDetails = getContextDetails(request).filter((item) => item.value != null);
-
   return (
     <div className="flex h-full w-full min-w-[320px] flex-col gap-0">
-      <Accordion multiple defaultValue={["general", "context", "response", "request"]}>
+      <Accordion multiple defaultValue={["general", "forge-trpc", "context", "response", "request"]}>
         {/* General */}
         <AccordionItem value="general" className="border-none">
           <AccordionTrigger className="cursor-pointer rounded-none border-0 border-y border-border bg-muted p-1.5 text-xs hover:no-underline">
@@ -142,13 +135,35 @@ function HeadersTab({ request }: HeadersTabProps) {
           <AccordionContent className="p-2 text-xs">
             <Table className="text-xs">
               <TableBody>
-                {generalDetails.map((detail) => (
-                  <RequestDetailRow key={detail.name} detail={detail} />
-                ))}
+                {getGeneralDetails(request)
+                  .filter((item) => item.value != null)
+                  .map((detail) => (
+                    <RequestDetailRow key={detail.name} detail={detail} />
+                  ))}
               </TableBody>
             </Table>
           </AccordionContent>
         </AccordionItem>
+
+        {/* Forge tRPC */}
+        {isForgeTrpcRequest(request.parsedRequest) && (
+          <AccordionItem value="forge-trpc" className="border-none">
+            <AccordionTrigger className="cursor-pointer rounded-none border-0 border-y border-border bg-muted p-1.5 text-xs hover:no-underline">
+              Forge tRPC
+            </AccordionTrigger>
+            <AccordionContent className="p-2 text-xs">
+              <Table className="text-xs">
+                <TableBody>
+                  {getForgeTrpcDetails(request)
+                    .filter((item) => item.value != null)
+                    .map((detail) => (
+                      <RequestDetailRow key={detail.name} detail={detail} />
+                    ))}
+                </TableBody>
+              </Table>
+            </AccordionContent>
+          </AccordionItem>
+        )}
 
         {/* Context */}
         <AccordionItem value="context" className="border-none">
@@ -158,10 +173,11 @@ function HeadersTab({ request }: HeadersTabProps) {
           <AccordionContent className="p-2 text-xs">
             <Table className="text-xs">
               <TableBody>
-                {contextDetails.length === 0 && <p>No invocation context for this request.</p>}
-                {contextDetails.map((detail) => (
-                  <RequestDetailRow key={detail.name} detail={detail} />
-                ))}
+                {getContextDetails(request)
+                  .filter((item) => item.value != null)
+                  .map((detail) => (
+                    <RequestDetailRow key={detail.name} detail={detail} />
+                  ))}
               </TableBody>
             </Table>
           </AccordionContent>

@@ -8,8 +8,15 @@ import {
   AtlassianInvokeExtensionRequestSchema,
   AtlassianRequestHarEntrySchema,
 } from "@/schemas/atlassian";
+import {
+  type ForgeTrpcRequest,
+  ForgeTrpcRequestSchema,
+  type ForgeTrpcResponse,
+  ForgeTrpcResponseSchema,
+} from "@/schemas/forge-trpc";
 import type {
   AtlassianEntry,
+  AtlassianFunctionRequest,
   AtlassianFunctionResponse,
   AtlassianRemoteResponse,
   AtlassianRequest,
@@ -85,6 +92,7 @@ function parseRequest(entry: Entry | Browser.devtools.network.Request): Atlassia
       functionKey: payload.call.functionKey,
       body: payload.call.payload,
       context: parseRequestContext(validatedRequest),
+      trpc: parseForgeTrpcRequest(payload.call.payload),
     };
   }
 
@@ -118,6 +126,19 @@ function parseRequestContext(request: AtlassianInvokeExtensionRequest) {
     moduleKey: payload.context?.moduleKey ?? undefined,
     localId: payload.context?.localId ?? undefined,
   };
+}
+
+/**
+ * Parses a Forge tRPC request from the body of an Atlassian Forge Function invocation.
+ * @param body the body of the Atlassian Forge Function invocation
+ * @return the parsed Forge tRPC request, or undefined if the body is not a Forge tRPC request
+ */
+function parseForgeTrpcRequest(body: unknown): ForgeTrpcRequest | undefined {
+  const result = ForgeTrpcRequestSchema.safeParse(body);
+  if (!result.success) {
+    return undefined;
+  }
+  return result.data;
 }
 
 /**
@@ -182,7 +203,7 @@ function parseResponse(
 ): AtlassianResponse {
   switch (parsedRequest.type) {
     case "invoke":
-      return parseFunctionResponse(entry, responseBody);
+      return parseFunctionResponse(entry, parsedRequest, responseBody);
     case "invokeRemote":
       return parseRemoteResponse(entry, responseBody);
   }
@@ -191,12 +212,14 @@ function parseResponse(
 /**
  * Parses the Atlassian response from an Atlassian Forge extension function invocation (function call).
  * @param entry the HAR entry of the Atlassian Forge extension function invocation
+ * @param parsedRequest the parsed Atlassian request
  * @param responseBody the response body of the HAR entry
  * @return the parsed Atlassian response
  * @throws Error if unable to parse the Atlassian response from the HAR entry
  */
 function parseFunctionResponse(
   entry: Entry | Browser.devtools.network.Request,
+  parsedRequest: AtlassianFunctionRequest,
   responseBody: string,
 ): AtlassianFunctionResponse {
   // Parse the response body
@@ -262,7 +285,21 @@ function parseFunctionResponse(
     transferredSize: entry.response._transferSize ?? entry.response.content.size,
     size: entry.response.content.size,
     duration: entry.time,
+    trpc: parsedRequest.trpc != null ? parseForgeTrpcResponse(response.body) : undefined,
   };
+}
+
+/**
+ * Parses a Forge tRPC response from the body of an Atlassian Forge Function invocation.
+ * @param body the body of the Atlassian Forge Function invocation
+ * @return the parsed Forge tRPC response, or undefined if the body is not a Forge tRPC response
+ */
+function parseForgeTrpcResponse(body: unknown): ForgeTrpcResponse | undefined {
+  const result = ForgeTrpcResponseSchema.safeParse(body);
+  if (!result.success) {
+    return undefined;
+  }
+  return result.data;
 }
 
 /**

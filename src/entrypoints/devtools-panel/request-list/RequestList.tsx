@@ -1,4 +1,5 @@
 import ResponseStatusBadge from "@/components/response-status-badge/ResponseStatusBadge";
+import TrpcResponseStatusBadge from "@/components/trpc-response-status-badge/TrpcResponseStatusBadge";
 import {
   ContextMenu,
   ContextMenuCheckboxItem,
@@ -52,11 +53,6 @@ const features = tableFeatures({
 const columnHelper = createColumnHelper<typeof features, AtlassianEntry>();
 
 const columns = columnHelper.columns([
-  columnHelper.accessor("parsedRequest.type", {
-    id: "type",
-    header: "Type",
-    size: 90,
-  }),
   columnHelper.accessor("parsedResponse.status", {
     id: "status",
     header: "Status",
@@ -65,6 +61,11 @@ const columns = columnHelper.columns([
       const entry = props.row.original;
       return <ResponseStatusBadge response={entry.parsedResponse} />;
     },
+  }),
+  columnHelper.accessor("parsedRequest.type", {
+    id: "type",
+    header: "Type",
+    size: 90,
   }),
   columnHelper.accessor("parsedRequest.functionKey", {
     id: "functionKey",
@@ -79,6 +80,25 @@ const columns = columnHelper.columns([
   columnHelper.accessor("parsedRequest.path", {
     id: "path",
     header: "Path",
+    size: 160,
+  }),
+  columnHelper.accessor("parsedRequest.trpc", {
+    id: "trpcStatus",
+    header: "tRPC Status",
+    size: 80,
+    cell: (props) => {
+      const entry = props.row.original;
+      return <TrpcResponseStatusBadge response={entry.parsedResponse} />;
+    },
+  }),
+  columnHelper.accessor("parsedRequest.trpc.type", {
+    id: "trpcType",
+    header: "tRPC Type",
+    size: 80,
+  }),
+  columnHelper.accessor("parsedRequest.trpc.path", {
+    id: "trpcPath",
+    header: "tRPC Path",
     size: 160,
   }),
   columnHelper.accessor("parsedRequest.context.siteUrl", {
@@ -159,7 +179,10 @@ const filterByPathOrFunctionKey: FilterFn<typeof features, AtlassianEntry> = (ro
   }
   const path = (row.getValue<string>("path") ?? "").toLowerCase();
   const functionKey = (row.getValue<string>("functionKey") ?? "").toLowerCase();
-  return path.includes(normalizedFilter) || functionKey.includes(normalizedFilter);
+  const trpcPath = (row.getValue<string>("trpcPath") ?? "").toLowerCase();
+  return (
+    path.includes(normalizedFilter) || functionKey.includes(normalizedFilter) || trpcPath.includes(normalizedFilter)
+  );
 };
 
 function RequestList({ filter, requests, selectedRequest, onSelect, onResend, onEdit }: RequestListProps) {
@@ -170,6 +193,8 @@ function RequestList({ filter, requests, selectedRequest, onSelect, onResend, on
     functionKey: true,
     method: true,
     path: true,
+    trpcType: false,
+    trpcPath: false,
     siteUrl: false,
     cloudId: false,
     appVersion: false,

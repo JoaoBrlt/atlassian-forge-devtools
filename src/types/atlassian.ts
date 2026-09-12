@@ -1,3 +1,4 @@
+import type { ForgeTrpcRequest, ForgeTrpcResponse } from "@/schemas/forge-trpc";
 import type { Entry } from "har-format";
 
 /**
@@ -22,6 +23,7 @@ export interface AtlassianFunctionRequest<RequestType = unknown> {
   functionKey: string;
   body?: RequestType;
   context: AtlassianRequestContext;
+  trpc?: ForgeTrpcRequest;
 }
 
 /**
@@ -73,6 +75,7 @@ export interface AtlassianFunctionSuccessResponse<ResponseType = unknown> {
   transferredSize: number;
   size: number;
   duration: number;
+  trpc?: ForgeTrpcResponse;
 }
 
 /**
